@@ -1,0 +1,1 @@
+improve your strategy from the prior lab by at least 10% by using minimax or negamax. from here onwards, you have 1.5s per move. 

@@ -1,0 +1,5 @@
+due 12/12
+
+Write a function that takes a bard as input, and also which token is to move, and returns a data structure indicating all possible squares that may be played into by that token. This lab should be demonstrated with a script that takes as input an optional board (defaults to the starting board, '.'*27 + 'OX......XO' + '.'*27) and an optional token (default to the token that would play next if there are no passes). 
+
+You should print a 2D representation of the board indicating the possible move positions with an asterisk. Following this should be a sequence of all possible moves, output as integers, and not in A1 style. If no moves are possible (such as when a game is completed or a side must pass), you should not print out any numbers -- just print out No moves possible. You should be able to accomodate both upper and lowercase x and o symbols in both the board and the token argument.

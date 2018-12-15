@@ -1,0 +1,7 @@
+due 12/21
+
+Entend (or generalize, if you will) Lab 2 by allowing for an arbitrary sequence of moves, with alternate sides playing. After each move, the same information should be printed out as in the prior lab. Lab 1 and 2 are demonstratig basic functionality of underlying routines, while lab 3 is a lab that may be useful for later debugging. 
+
+All inputs are optional. If no board is given, assume the standard starting board. If no token is given, assume it is the side that would play if there have been no passes (unless that side must pass). If no move is given, it is an indication to display the board and the move options for the given board.
+
+The required output is a starting snapshot, followed by a snapshot for each played move. The moves alternate between players, unless one side is forced to pass, in which case the indicated move is for the side that must play. That is to say, in this lab, you must determine whether no moves are possible (ie whether a pass is forced) in order to ensure that you know which token is being played. Also, if any of the inputs is a negative number, such number should be ignored (with no associated snapshot). Otherwise, as in lab 2, all moves will be legal.

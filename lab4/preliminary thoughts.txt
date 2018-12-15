@@ -1,0 +1,9 @@
+- corners are good, but not vital
+- edges are also good, a tad less so, but also not vital
+- flipping few opposing tokens at the beginning of the game is good while flipping many at the end is good
+--> basically, don't give them a ton of options at the beginning
+- try to balance out your tokens on either side to increase the number of possible moves you can make
+- try to keep your own tokens packed together to decrease their potential moves
+- cutting off a side of the opponent's
+- really try to keep yours as solid as possible
+- maybe for now just sort by minimizing # next moves for opp
