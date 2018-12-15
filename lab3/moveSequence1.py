@@ -223,3 +223,5 @@ def play(startTkns, startboard, movePos):
         print('Score: {}/{}'.format(xCount, oCount))
         print(startboard)
         print('No possible moves.')
+
+print('hi')
