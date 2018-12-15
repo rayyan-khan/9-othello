@@ -1,14 +1,34 @@
+import sys
 
-# version 2 of this, modified to create subsets and not include neighbors in which no move can be made
+# version 3 of this, modified from possMoves1 to be turn-in-able
 # its so ugly though figure out how to fix it
 # also comment/organize before it gets too confusing
 # NBRS might be redundant now that there's SUBSETS but oh well think about that later
 
-defaultBoard = '.'*27 + 'ox......xo' + '.'*27
 
-# globals
+# variables
+defaultBoard = '.'*27 + 'ox......xo' + '.'*27
 NBRS = {} # NBRS = {index: {adjacent indexes that moves can be made from}}
 SUBSETS = [] # SUBSETS = [{nbr: [indexes in subset], nbr: [indexes in subset]}, {etc...}]
+startboard = defaultBoard
+startTkns = ''
+
+inpts = len(sys.argv) # make nicer later
+if inpts == 3:
+    if len(sys.argv[1]) == 64:
+        startboard = sys.argv[1].lower()
+        startTkns = sys.argv[2].lower()
+    elif len(sys.argv[1]) == 1:
+        startTkns = sys.argv[1]
+        startboard = sys.argv[2].lower()
+elif inpts == 2:
+    if len(sys.argv[1]) == 64:
+        startboard = sys.argv[1].lower()
+    elif len(sys.argv[1]) == 1:
+        startTkns = sys.argv[1].lower()
+
+
+#print('VARIABLES: len(sys.argv) = {} \nStart tokens: {}\nStartboard: {}'.format(len(sys.argv), startTkns, startboard))
 
 # setting up NBRS -- part 1
 idxs = [i for i in range(0, len(defaultBoard))]
@@ -58,8 +78,7 @@ delInds = {key for key in NBRS if len(NBRS[key]) == 0}
 for key in delInds:
     del NBRS[key]
 
-for key in range(64):
-    print(key, ':', SUBSETS[key])
+
 
 # helper methods
 
@@ -73,10 +92,25 @@ def printPossMoves(board, possMoves):
                         else '*' for idx, ch in enumerate(board)]))
 
 
+def heylookcoolandflashylookhereherehere(x):
+    # if you read this Dr. Gabor, just know that its existence was
+    # a bit of a dare, and this has good reason to be here.
+    # someone else chose the name of the method.
+    # but also I'm taking it out next version.
+    return x
+heylookcoolandflashylookhereherehere(5)
+
+
 def nextTokens(board): # assuming no passes
     if board.count('.') % 2: # do better later
         return 'o', 'x' # next token, token after
     return 'x', 'o'
+
+
+def getOppToken(token):
+    if token == 'x':
+        return 'o'
+    return 'x'
 
 
 def checkBracketing(token, possInd, adjInd, board):
@@ -102,22 +136,43 @@ def checkBracketing(token, possInd, adjInd, board):
 
 
 
-def nextMoves(board):
+def nextMoves(board, tokens = ''):
     possMoves = set() # wow come up with a better name
-    token, oppToken = nextTokens(board)
+
+    if tokens == '':
+        token, oppToken = nextTokens(board)
+    else:
+        token, oppToken = tokens, getOppToken(tokens)
+
+    #print('tokens: {} token: {} oppToken: {}'.format(tokens, token, oppToken))
 
     for idx in range(64):
-        # lol don't check all this fr
+        # lol don't check all this later
 
         if board[idx] == oppToken:
-            for nbr in NBRS[idx]: # cringey
+            #print(idx)
+            for nbr in NBRS[idx]: # cringe
                 if board[nbr] == '.':
                     if checkBracketing(token, nbr, idx, board):
                         possMoves.add(nbr)
-    return possMoves
+    return len(possMoves), possMoves
 
 
-printBoard(defaultBoard)
-possMoves = nextMoves(defaultBoard)
-print('next moves:', possMoves)
-printPossMoves(defaultBoard, possMoves)
+# testing
+testboard1 = defaultBoard
+# expected next moves = {19, 26, 37, 44}
+
+testboard2 = '...................x.......xxo.....xoo.......o..................'
+# expected next moves = {30, 39, 45, 47, 56}
+
+testboard3 = '.'*19 + 'x' + '.'*7 + 'xxo' + '.'*5 + 'xxxo' + '.'*6 + 'o.o' + '.'*16
+# expected next moves: double check later tbh
+
+#board = testboard3
+
+canMove, possMoves = nextMoves(startboard, startTkns)
+if canMove:
+    printPossMoves(startboard, possMoves)
+    print('next moves:', possMoves)
+else:
+    print('No possible moves.')
