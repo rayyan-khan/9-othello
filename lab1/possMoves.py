@@ -1,6 +1,6 @@
 import sys
 
-# version 3 of this, modified from possMoves1 to be turn-in-able
+# version 4 of this, took out all the print statements from possMoves2
 # its so ugly though figure out how to fix it
 # also comment/organize before it gets too confusing
 # NBRS might be redundant now that there's SUBSETS but oh well think about that later
@@ -27,8 +27,6 @@ elif inpts == 2:
     elif len(sys.argv[1]) == 1:
         startTkns = sys.argv[1].lower()
 
-
-#print('VARIABLES: len(sys.argv) = {} \nStart tokens: {}\nStartboard: {}'.format(len(sys.argv), startTkns, startboard))
 
 # setting up NBRS -- part 1
 idxs = [i for i in range(0, len(defaultBoard))]
@@ -144,13 +142,11 @@ def nextMoves(board, tokens = ''):
     else:
         token, oppToken = tokens, getOppToken(tokens)
 
-    #print('tokens: {} token: {} oppToken: {}'.format(tokens, token, oppToken))
 
-    for idx in range(64):
+    for idx in NBRS:
         # lol don't check all this later
 
         if board[idx] == oppToken:
-            #print(idx)
             for nbr in NBRS[idx]: # cringe
                 if board[nbr] == '.':
                     if checkBracketing(token, nbr, idx, board):
@@ -158,21 +154,12 @@ def nextMoves(board, tokens = ''):
     return len(possMoves), possMoves
 
 
-# testing
-testboard1 = defaultBoard
-# expected next moves = {19, 26, 37, 44}
 
-testboard2 = '...................x.......xxo.....xoo.......o..................'
-# expected next moves = {30, 39, 45, 47, 56}
-
-testboard3 = '.'*19 + 'x' + '.'*7 + 'xxo' + '.'*5 + 'xxxo' + '.'*6 + 'o.o' + '.'*16
-# expected next moves: double check later tbh
-
-#board = testboard3
-
+# run
 canMove, possMoves = nextMoves(startboard, startTkns)
+
 if canMove:
     printPossMoves(startboard, possMoves)
     print('next moves:', possMoves)
 else:
-    print('No possible moves.')
+    print('No moves possible.')
