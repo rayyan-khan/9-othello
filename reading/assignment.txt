@@ -1,8 +1,0 @@
-due 1/9
-
-With lab 1 (and also 2 and 3), you had a script that could be used to play othello on an automated basis. In particular, there might be a moderator script which calls your script with a board and specified token, and then reads back the output and snatches the final integer from it, construing it as the preferred move. If your lab 1 script were to run against another script producing random moves (which is what your lab 1 amounts to), then you would expect a 50% win rate. 
-
-In this lab you should improve your script to achieve a better win rate against random,  to say at least 70%, by selecting a best move rather than an arbitrary move. The grade will be based on the percent of tokens that your script winds up with compared to the total number of tokens involved in all the games that your script plays. 
-
-Your script will be time constrained in the game so that you have about .25s per move. This means, that the firts thing that your script should do is print a random valid move, which you will already have achieved through lab 1. Then, as your script finds a better move, you should print it. the moderator will take the last move your script printed before exiting or being timed out, whichever comes first. If your script errors (which it shouldn't if your lab 1 passed), your script will be rejected. 
-
