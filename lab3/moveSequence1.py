@@ -145,7 +145,7 @@ def nextMoves(board, tokens = ''):
     for idx in TKNSETS[oppToken]: # check opposing token indexes
         for nbr in NBRS_moves[idx]: # check if there are spaces you can move into
             if board[nbr] == '.':
-                if checkBracketing(token, nbr, idx, board) > -1:
+                if checkBracketing(token, nbr, idx, board) != -1:
                     # if placing here check whether there's another
                     # token down the line it would form a bracket with
                     possMoves.add(nbr) # if so it's a possible move
@@ -155,6 +155,7 @@ def nextMoves(board, tokens = ''):
 
 def makeFlips(board, token, position):
     oppToken = getOppToken(token)
+
     adjOpps = {nbr for nbr in NBRS_flips[position]
                if board[nbr] == oppToken and position in SUBSETS[nbr]}
 
@@ -164,18 +165,48 @@ def makeFlips(board, token, position):
             subset = SUBSETS[opp][position]
             changes = set(subset[:subset.index(idx) + 1] + [position, opp])
             TKNSETS[token] = TKNSETS[token].union(changes) - {0, 7, 56, 63}
+            TKNSETS[oppToken] = TKNSETS[oppToken] - changes
             board = ''.join([ch if ind not in changes else token for ind, ch in enumerate(board)])
     return board
+
+
+def nextMovesTest(board, tokens = ''):
+
+    print('\n'*3 + '*'*40 + tokens, board + '*'*40)
+
+    possMoves = set() # {indexes that given/default token may make a move at}
+
+    if tokens == '': # if token isn't given
+        token, oppToken = nextTokens(board) # assume no passes and find next token
+    else:
+        token, oppToken = tokens, getOppToken(tokens)
+
+
+    print(TKNSETS[oppToken])
+    for idx in TKNSETS[oppToken]: # check opposing token indexes
+        for nbr in NBRS_moves[idx]: # check if there are spaces you can move into
+            if board[nbr] == '.':
+                print('tkn {} nbr {} idx {} bracket {}'
+                      .format(token, nbr, idx, checkBracketing(token, nbr, idx, board)))
+                if checkBracketing(token, nbr, idx, board) != -1:
+                    # if placing here check whether there's another
+                    # token down the line it would form a bracket with
+                    possMoves.add(nbr) # if so it's a possible move
+    # if len(possMoves) == 0, then nextMoves[0] == False
+    return len(possMoves), possMoves
 
 
 def play(tkn, oppTkn, movePos, board):
     print('\nPlayer {} moves to {}:'.format(tkn, movePos))
     flippedBoard = makeFlips(board, tkn, movePos)
-    canMove, possOppMoves = nextMoves(flippedBoard, oppTkn)
+    canOppMove, possOppMoves = nextMoves(flippedBoard, oppTkn)
+    if movePos == 1:
+        canOppMove, possOppMoves = nextMovesTest(flippedBoard, oppTkn)
+        print('*'*40 + '\n' + tkn, oppTkn, str(canOppMove) + '\n' + flippedBoard + '\n' + str(possOppMoves) + '\n' + '*'*20)
     printBoard(flippedBoard)
     xTokens, oTokens = getScore(flippedBoard)
     print('\n' + flippedBoard + ' {}/{}'.format(xTokens, oTokens))
-    if canMove:
+    if canOppMove:
         print('Possible moves for {}: {}'.format(oppTkn, possOppMoves))
         printPossMoves(flippedBoard, possOppMoves)
         return oppTkn, tkn, flippedBoard
@@ -183,7 +214,7 @@ def play(tkn, oppTkn, movePos, board):
         canMove, possMoves = nextMoves(flippedBoard, tkn)
         if canMove:
             print('Possible moves for {}: {}'.format(tkn, possMoves))
-        print('HELLO SWITCHING SIDES!!!!!!!!!!!!!!!', movePos)
+        print('HELLO PASSING!!!!!!!!!!!!!!!', movePos)
         return tkn, oppTkn, flippedBoard
 
 # run
