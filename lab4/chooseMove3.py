@@ -180,3 +180,7 @@ def printSorted(board, token):
     oppTkn = getOppToken(token)
     canMove, possMoves = nextMoves(board, token)
     print(sortMoves(token, oppTkn, board, possMoves))
+
+
+# run
+printSorted(startboard, startTkn)
