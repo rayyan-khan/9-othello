@@ -1,6 +1,7 @@
 import sys
+import operator
 
-# 66%
+# 75%
 
 # inputs from sys
 startboard = sys.argv[1].lower()
@@ -18,6 +19,8 @@ CNR_EDGES = {0: {1,2,3,4,5,6,7,8,16,24,32,40,48,56}, 7: {0,1,2,3,4,5,6,15,23,31,
 EDGE_CNR = {edgeInd: corner for corner in CNR_EDGES for edgeInd in CNR_EDGES[corner]}
 CORNERS = {0, 7, 56, 63}
 CX = {1: 0, 8: 0, 9: 0, 6: 7, 14: 7, 15: 7, 48: 56, 49: 56, 57: 56, 54: 63, 55: 63, 62: 63}
+
+
 
 # setting up NBRS -- part 1
 idxs = [i for i in range(0, len(startboard))]
@@ -151,7 +154,7 @@ def makeFlips(board, token, position):
             subset = SUBSETS[opp][position]
             changes = set(subset[:subset.index(idx) + 1] + [position, opp])
             numChanges += len(changes)
-            TKNSETS[token] = TKNSETS[token].union(changes) - {0, 7, 56, 63}
+            TKNSETS[token] = TKNSETS[token].union(changes) - CORNERS
             TKNSETS[oppToken] = TKNSETS[oppToken] - changes
             board = ''.join([ch if ind not in changes else token for ind, ch in enumerate(board)])
     return board, numChanges
@@ -163,32 +166,38 @@ def sortMoves(token, oppTkn, board, possMoves):
     sortedMoves = []
     boardProgress = 64 - board.count('.')
     for move in possMoves:
-        score = 0
-        flippedBoard, numChanges = makeFlips(board, token, move)
+        isCorner = 0
+        isEdge = 0
+        isCX = 0
+        numChanges = 0
+        oppSkip = 0
 
-        # if near the end of the game try to flip as many as possible
-        if boardProgress >= 32:
-            score += numChanges
+        # if you're near the end of the game flip as many as possible?
+        if boardProgress > 32:
+            numChanges = makeFlips(board, token, move)[0]
 
-        #oppCanMove, oppPossMoves = nextMoves(startboard, startTkn)
-        #if not oppCanMove:
-        #    score += 2
+        # if the move results in a pass for the other side try to prioritize it
+        oppCanMove, oppPossMoves = nextMoves(startboard, startTkn)
+        if not oppCanMove:
+            oppSkip = 1
 
         # just checking for corners and edges and stuff like that
         if move in CORNERS:
-            score += 2
+            isCorner = 1
         elif move in EDGE_CNR:
-            if move in CX:
-                if board[CX[move]] == '.':
-                    score = -100
-                elif board[CX[move]] == oppTkn:
-                    score = -99
-            elif board[EDGE_CNR[move]] == token:
-                score += 1
+            if board[EDGE_CNR[move]] == token:
+                isEdge = 1
+            else:
+                isEdge = -1
+        if move in CX:
+            if board[CX[move]] == '.':
+                isCX = -2
+            elif board[CX[move]] == oppTkn:
+                isCX = -1
 
-        sortedMoves.append((score, move))
+        sortedMoves.append((oppSkip, isCorner, isCX, isEdge, numChanges, move))
 
-    return sorted(sortedMoves)
+    return sorted(sortedMoves, key=operator.itemgetter(0, 1, 2, 3, 4))
 
 
 def printSorted(board, token):

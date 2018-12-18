@@ -1,6 +1,6 @@
 import sys
 
-# 66%
+# 75%
 
 # inputs from sys
 startboard = sys.argv[1].lower()
@@ -18,6 +18,8 @@ CNR_EDGES = {0: {1,2,3,4,5,6,7,8,16,24,32,40,48,56}, 7: {0,1,2,3,4,5,6,15,23,31,
 EDGE_CNR = {edgeInd: corner for corner in CNR_EDGES for edgeInd in CNR_EDGES[corner]}
 CORNERS = {0, 7, 56, 63}
 CX = {1: 0, 8: 0, 9: 0, 6: 7, 14: 7, 15: 7, 48: 56, 49: 56, 57: 56, 54: 63, 55: 63, 62: 63}
+
+
 
 # setting up NBRS -- part 1
 idxs = [i for i in range(0, len(startboard))]
@@ -161,30 +163,30 @@ def sortMoves(token, oppTkn, board, possMoves):
     # remember that the grader looks at the last int printed, so
     # print the best move last -- ascending order in this case
     sortedMoves = []
-    boardProgress = 64 - board.count('.')
+    #boardProgress = 64 - board.count('.')
     for move in possMoves:
         score = 0
-        flippedBoard, numChanges = makeFlips(board, token, move)
+        #flippedBoard, numChanges = makeFlips(board, token, move)
 
         # if near the end of the game try to flip as many as possible
-        if boardProgress >= 32:
-            score += numChanges
+        #if boardProgress >= 32:
+        #    score += numChanges
 
-        #oppCanMove, oppPossMoves = nextMoves(startboard, startTkn)
-        #if not oppCanMove:
-        #    score += 2
+        oppCanMove, oppPossMoves = nextMoves(startboard, startTkn)
+        if not oppCanMove:
+            score += 2
 
         # just checking for corners and edges and stuff like that
         if move in CORNERS:
             score += 2
         elif move in EDGE_CNR:
-            if move in CX:
-                if board[CX[move]] == '.':
-                    score = -100
-                elif board[CX[move]] == oppTkn:
-                    score = -99
-            elif board[EDGE_CNR[move]] == token:
+            if board[EDGE_CNR[move]] == token:
                 score += 1
+        if move in CX:
+            if board[CX[move]] == '.':
+                score = -100
+            elif board[CX[move]] == oppTkn:
+                score = -99
 
         sortedMoves.append((score, move))
 
