@@ -207,7 +207,6 @@ if canMove: # if you can make a move
 
         # check if the opposing token can make moves on flipped board
         canMove, possMoves = nextMoves(flippedBoard, oppTkn)
-        oppPass = False
         if canMove: # if it can, print its possible moves
             print('Possible moves for {}: {}'.format(oppTkn, possMoves))
         else: # otherwise, pass and check if your token

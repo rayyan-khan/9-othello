@@ -124,14 +124,14 @@ def checkBracketing(token, possInd, adjInd, board):
         if board[index] == '.':
             # if you run into an empty space before bracketing token
             # then it doesn't work
-            return -1
+            return False
         elif board[index] == token:
             # if you find a bracketing token somewhere along the line
             # then it does form a bracket
             return index # return the ending index
     # if you get through the entire subset and don't find a bracketing token
     # then too bad
-    return -1
+    return False
 
 
 def nextMoves(board, tokens = ''):
@@ -145,7 +145,7 @@ def nextMoves(board, tokens = ''):
     for idx in TKNSETS[oppToken]: # check opposing token indexes
         for nbr in NBRS_moves[idx]: # check if there are spaces you can move into
             if board[nbr] == '.':
-                if checkBracketing(token, nbr, idx, board) > -1:
+                if checkBracketing(token, nbr, idx, board):
                     # if placing here check whether there's another
                     # token down the line it would form a bracket with
                     possMoves.add(nbr) # if so it's a possible move
@@ -160,7 +160,7 @@ def makeFlips(board, token, position):
 
     for opp in adjOpps: # do better later
         idx = checkBracketing(token, position, opp, board) # maybe pass in idx rather than re-finding
-        if idx > -1:
+        if idx:
             subset = SUBSETS[opp][position]
             changes = set(subset[:subset.index(idx) + 1] + [position, opp])
             TKNSETS[token] = TKNSETS[token].union(changes) - {0, 7, 56, 63}
@@ -168,49 +168,69 @@ def makeFlips(board, token, position):
     return board
 
 
-def play(tkn, oppTkn, movePos, board):
-    print('\nPlayer {} moves to {}:'.format(tkn, movePos))
-    flippedBoard = makeFlips(board, tkn, movePos)
-    canMove, possOppMoves = nextMoves(flippedBoard, oppTkn)
-    printBoard(flippedBoard)
-    xTokens, oTokens = getScore(flippedBoard)
-    print('\n' + flippedBoard + ' {}/{}'.format(xTokens, oTokens))
-    if canMove:
-        print('Possible moves for {}: {}'.format(oppTkn, possOppMoves))
-        printPossMoves(flippedBoard, possOppMoves)
-        return oppTkn, tkn, flippedBoard
+def play(startTkns, startboard, movePos):
+    # takes in token, board, move position
+    # outputs the resulting snapshots as specified
+    # by the lab 2 assignment
+    if startTkns == '':
+        startTkns, oppTkn = nextTokens(startboard)
     else:
-        canMove, possMoves = nextMoves(flippedBoard, tkn)
-        if canMove:
-            print('Possible moves for {}: {}'.format(tkn, possMoves))
-        print('HELLO SWITCHING SIDES!!!!!!!!!!!!!!!', movePos)
-        return tkn, oppTkn, flippedBoard
+        oppTkn = getOppToken(startTkns)
+    canMove, possMoves = nextMoves(startboard, startTkns)
+
+    if canMove: # if you can make a move
+
+        # if not a possible move, just print the first snapshot
+        if movePos not in possMoves:
+            printPossMoves(startboard, possMoves)
+            xCount, oCount = getScore(startboard)
+            print('Possible moves for {} : {}'
+                  .format(startTkns, possMoves))
+            print('\n' + startboard + ' {}/{}'.format(xCount, oCount) + '\n')
+
+        # if a possible move, print the first and second snapshots
+        # + possible moves for next opponent
+        elif movePos != '':
+            # first print board rep of possMoves, then score,
+            # then possMoves listed, then string rep of board
+            printPossMoves(startboard, possMoves)
+            xCount, oCount = getScore(startboard)
+            print('\n' + startboard + ' {}/{}'.format(xCount, oCount) + '\n')
+            print('Possible moves for {} : {}'
+                  .format(startTkns, possMoves))
+
+            # print move made, then board resulting from the move
+            # and new score followed by string rep of new board
+            print('Player {} moves to {}:'.format(startTkns, movePos))
+            flippedBoard = makeFlips(startboard, startTkns, movePos)
+            printBoard(flippedBoard)
+            xCount, oCount = getScore(flippedBoard)
+            print('\n' + flippedBoard + ' {}/{}'.format(xCount, oCount))
+
+            # check if the opposing token can make moves on flipped board
+            canMove, possMoves = nextMoves(flippedBoard, oppTkn)
+            if canMove: # if it can, print its possible moves
+                print('Possible moves for {}: {}'.format(oppTkn, possMoves))
+            else: # otherwise, pass and check if your token
+                # can make a move on the board
+                canMove, possMoves = nextMoves(flippedBoard, startTkns)
+                if canMove:
+                    print('Possible moves for {}: {}'.format(startTkns, possMoves))
+            return flippedBoard
+
+    else: # if no moves possible, say so
+        printBoard(startboard)
+        xCount, oCount = getScore(startboard)
+        print('Score: {}/{}'.format(xCount, oCount))
+        print('\n' + startboard)
+        print('No possible moves.')
+        return startboard
+
 
 # run
-
-if startTkns == '':
-    startTkns, oppTkn = nextTokens(startboard)
+if not moveList:
+    play(startTkns, startboard, '')
 else:
-    oppTkn = getOppToken(startTkns)
-canMove, possMoves = nextMoves(startboard, startTkns)
-if canMove == False:
-    canMove, possMoves = nextMoves(startboard, oppTkn)
-    startTkns, oppTkn = oppTkn, startTkns
-
-if len(moveList) == 0:
-    xTokens, oTokens = getScore(startboard)
-    printPossMoves(startboard, possMoves)
-    print('\n' + startboard + ' {}/{}'.format(xTokens, oTokens))
-    if canMove:
-        print('Possible moves for {}: {}'.format(startTkns, possMoves))
-
-else:
-    xTokens, oTokens = getScore(startboard)
-    canMove, possMoves = nextMoves(startboard, startTkns)
-    printBoard(startboard)
-    print('\n' + startboard + ' {}/{}'.format(xTokens, oTokens))
-    if canMove:
-        print('Possible moves for {}: {}'.format(startTkns, possMoves))
     for movePos in moveList:
-        if movePos < 0: continue
-        startTkns, oppTkn, startboard = play(startTkns, oppTkn, movePos, startboard)
+        print("MOVE", movePos)
+        startboard = play(startTkns, startboard, movePos)
