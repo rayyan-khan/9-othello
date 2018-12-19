@@ -159,6 +159,13 @@ def makeFlips(board, token, position):
             board = ''.join([ch if ind not in changes else token for ind, ch in enumerate(board)])
     return board, numChanges
 
+def getsSkunked(flippedBoard, token, oppTkn, oppPossMoves):
+    skunked = False
+    for pos in oppPossMoves:
+        oppFlips = makeFlips(flippedBoard, oppTkn, pos)
+        if oppFlips.count(token):
+            skunked = True
+    return skunked
 
 def sortMoves(token, oppTkn, board, possMoves):
     # remember that the grader looks at the last int printed, so
@@ -171,15 +178,20 @@ def sortMoves(token, oppTkn, board, possMoves):
         isCX = 0
         numChanges = 0
         oppSkip = 0
+        skunked = 0
 
         # if you're near the end of the game flip as many as possible?
         if boardProgress > 32:
-            numChanges = makeFlips(board, token, move)[0]
+            # note: check if token sets are being modified correctly
+            numChanges, flippedBoard = makeFlips(board, token, move)
 
         # if the move results in a pass for the other side try to prioritize it
         oppCanMove, oppPossMoves = nextMoves(startboard, startTkn)
         if not oppCanMove:
             oppSkip = 1
+        else:
+            if getsSkunked(flippedBoard, token, oppTkn, oppPossMoves):
+                skunked = -1
 
         # just checking for corners and edges and stuff like that
         if move in CORNERS:
@@ -195,9 +207,9 @@ def sortMoves(token, oppTkn, board, possMoves):
             elif board[CX[move]] == oppTkn:
                 isCX = -1
 
-        sortedMoves.append((oppSkip, isCorner, isCX, isEdge, numChanges, move))
+        sortedMoves.append((skunked, isCorner, isCX, isEdge, oppSkip, numChanges, move))
 
-    return sorted(sortedMoves, key=operator.itemgetter(0, 1, 2, 3, 4))
+    return sorted(sortedMoves, key=operator.itemgetter(0, 1, 2, 3, 4, 5))
 
 
 def printSorted(board, token):
