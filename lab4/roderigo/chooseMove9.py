@@ -1,29 +1,11 @@
 import sys
 
-# take lab2 run section, put it into a section, and loop it
-# update input to take in a list of moves rather than a single move
+# 76%
 
 # inputs from sys
-startboard = '.'*27 + 'ox......xo' + '.'*27
-startTkns = ''
-moveList = []
+startboard = sys.argv[1].lower()
+startTkn = sys.argv[2].lower()
 
-# assign those variables from sys input
-# works regardless of order (not checked)
-for k in range(1, len(sys.argv)):
-    if len(sys.argv[k]) == 64:
-        startboard = sys.argv[k].lower()
-    elif len(sys.argv[k]) in (1, 2):
-        if sys.argv[k].lower() in 'xo':
-            startTkns = sys.argv[k].lower()
-        elif sys.argv[k][0].lower() in 'abcdefgh':
-            moveList.append((int(sys.argv[k][1])-1)*8 + \
-                      'abcdefgh'.index(sys.argv[k][0].lower()))
-        else:
-            moveList.append(int(sys.argv[k]))
-    else:
-        print('Incorrect inputs at index {}:\nlength {}, {}'
-              .format(k, len(sys.argv[k]), sys.argv[k]))
 
 # global variables
 NBRS_flips = {} # NBRS_flips = {index: {adjacent indexes}}
@@ -31,7 +13,20 @@ NBRS_moves = {} # NBRS_moves = {index: {adjacent indexes that moves can be made 
 SUBSETS = [] # SUBSETS = [{nbr: [indexes in subset], nbr: [indexes in subset]}, {etc...}]
 TKNSETS = {'o': {i for i in range(64) if startboard[i] == 'o'} - {0, 7, 56, 63},
              'x': {i for i in range(64) if startboard[i] == 'x'} - {0, 7, 56, 63}} # set of indexes containing o and x
-
+CNR_EDGES = {0: {1,2,3,4,5,6,7,8,16,24,32,40,48,56}, 7: {0,1,2,3,4,5,6,15,23,31,39,47,55,63},
+         56: {0,8,16,24,32,40,48,57,58,59,60,61,62,63}, 63: {7,15,23,31,39,47,55,56,57,58,59,60,61,62}}
+EDGE_CNR = {edgeInd: corner for corner in CNR_EDGES for edgeInd in CNR_EDGES[corner]}
+CORNERS = {0, 7, 56, 63}
+CX = {1: 0, 8: 0, 9: 0, 6: 7, 14: 7, 15: 7, 48: 56, 49: 56, 57: 56, 54: 63, 55: 63, 62: 63}
+CX_a = {1, 8, 6, 15, 48, 57, 55, 62}
+CX_d = {9, 14, 49, 54}
+CNR_row = {0: {1:0, 2:1, 3:2, 4:3, 5:4, 6:5},
+           7: {6:0, 5:1, 4:2, 3:3, 2:4, 1:5, 0:6}} # remember other two corners
+CNR_col = {0: {8:0, 16:1, 24:2, 32:3, 40:4, 48:5, 56:6},
+           7: {15:0, 23:1, 31:2, 39:3, 47:4, 55:5, 63:0}} # remember other two
+CNR_diag = {0: {1:{2, 9, 16}, 2:{3, 10, 17, 24}, 3:{4, 11, 18, 25, 32},
+                4:{5, 12, 19, 26, 33, 40}, 5:{6, 13, 20, 27, 34, 41, 48},
+                6:{7, 14, 21, 28, 35, 42, 49, 56}}} # note: finish these later and try not to double count corners
 
 # setting up NBRS -- part 1
 idxs = [i for i in range(0, len(startboard))]
@@ -83,8 +78,8 @@ delInds = {key for key in NBRS_moves if len(NBRS_moves[key]) == 0}
 for key in delInds:
     del NBRS_moves[key]
 
-# helper methods
 
+# helper methods
 def getScore(board):
     return board.count('x'), board.count('o')
 
@@ -158,59 +153,138 @@ def makeFlips(board, token, position):
     adjOpps = {nbr for nbr in NBRS_flips[position]
                if board[nbr] == oppToken and position in SUBSETS[nbr]}
 
+    TKNSETS_copy = TKNSETS.copy()
+
+    allChanges = set()
     for opp in adjOpps: # do better later
         idx = checkBracketing(token, position, opp, board) # maybe pass in idx rather than re-finding
         if idx > -1:
             subset = SUBSETS[opp][position]
             changes = set(subset[:subset.index(idx) + 1] + [position, opp])
-            TKNSETS[token] = TKNSETS[token].union(changes) - {0, 7, 56, 63}
-            TKNSETS[oppToken] = TKNSETS[oppToken] - changes
+            allChanges = allChanges.union(changes)
+            TKNSETS_copy[token] = TKNSETS_copy[token].union(changes) - {0, 7, 56, 63}
+            TKNSETS_copy[oppToken] = TKNSETS_copy[oppToken] - changes
             board = ''.join([ch if ind not in changes else token for ind, ch in enumerate(board)])
-    return board
+    return board, allChanges, TKNSETS_copy
 
 
-def play(tkn, oppTkn, movePos, board):
-    print('\nPlayer {} moves to {}:'.format(tkn, movePos))
-    flippedBoard = makeFlips(board, tkn, movePos)
-    canOppMove, possOppMoves = nextMoves(flippedBoard, oppTkn)
-    printBoard(flippedBoard)
-    xTokens, oTokens = getScore(flippedBoard)
-    print('\n' + flippedBoard + ' {}/{}'.format(xTokens, oTokens))
-    if canOppMove:
-        print('Possible moves for {}: {}'.format(oppTkn, possOppMoves))
-        printPossMoves(flippedBoard, possOppMoves)
-        return oppTkn, tkn, flippedBoard
+def CNR_CX(token, oppTkn, board, move):
+    cnr_cx = 0
+    if move in CORNERS:
+        cnr_cx = 4
+    elif move in EDGE_CNR:
+        if board[EDGE_CNR[move]] == token:
+            cnr_cx = 2
+    if move in CX_a:
+        if board[CX[move]] == '.':
+            cnr_cx = -3
+        elif board[CX[move]] == oppTkn:
+            cnr_cx = -1
+        else:
+            cnr_cx = 4
+    elif move in CX_d:
+        if board[CX[move]] == '.':
+            cnr_cx = -4
+        elif board[CX[move]] == oppTkn:
+            cnr_cx = -2
+        else:
+            cnr_cx = 3
+    return cnr_cx/4
+
+
+def stableTokens(board, token):
+    stableTokens = 0
+    openSpaces = board.count('.')
+    if openSpaces > 52:
+        return stableTokens
     else:
-        canMove, possMoves = nextMoves(flippedBoard, tkn)
-        if canMove:
-            print('Possible moves for {}: {}'.format(tkn, possMoves))
-        return tkn, oppTkn, flippedBoard
+        if {board[0], board[1], board[8]} == {token}:
+            # 0 corner
+            stableTokens += 3
+            if board[9] == token:
+                stableTokens += 1
+            furthestIndex = 0
+            prev = 0
+            for index in CNR_row[0]:
+                if board[index] == token:
+                    stableTokens += 1
+                    prev = index
+                else:
+                    furthestIndex = CNR_row[0][prev]
+                    break
+            for index in CNR_col[0]:
+                if board[index] == token:
+                    stableTokens += 1
+                    prev = index
+                else:
+                    furthestIndex = CNR_col[0][prev]
+            if furthestIndex:
+                for diag in range(1, furthestIndex):
+                    currentDiag = CNR_diag[0][diag]
+                    if {board[ind] for ind in currentDiag} == {token}:
+                        stableTokens += len(currentDiag)
+                    else:
+                        break
+
+        if {board[6], board[7], board[15]} == {token}:
+            # 7 corner
+            stableTokens += 3
+            if board[14] == token:
+                stableTokens += 1
+        if {board[48], board[56], board[57]} == {token}:
+            # 56 corner
+            stableTokens += 3
+            if board[49] == token:
+                stableTokens += 1
+        if {board[55], board[62], board[63]} == {token}:
+            # 63 corner
+            stableTokens += 3
+            if board[54] == token:
+                stableTokens += 1
+
+    return stableTokens
+
+
+def stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, tknSet):
+    currentTokens = len(tknSet[token])
+    if len(oppPossMoves) == 0:
+        return currentTokens
+    flippedTokens = 0
+    for move in oppPossMoves:
+        oppFlipped, oppChanges, newTknSet = makeFlips(flippedBoard, oppTkn, move)
+        flippedTokens += len(tknSet[token].intersection(oppChanges))
+    return 1 - flippedTokens/len(oppPossMoves)/currentTokens
+
+
+def sortMoves(token, oppTkn, board, possMoves):
+    # remember that the grader looks at the last int printed, so
+    # print the best move last -- ascending order in this case
+    sortedMoves = []
+
+    boardPhase = {}
+
+    for move in possMoves:
+        flippedBoard, changes, TKNSETS_new = makeFlips(board, token, move)
+        oppCanMove, oppPossMoves = nextMoves(flippedBoard, oppTkn)
+
+        cnr_cx = CNR_CX(token, oppTkn, board, move)*3
+        skip = 1 if not oppCanMove else 0
+        stbl = stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, TKNSETS_new)
+
+        print('Move: {} CNR: {} Skip: {} STBL: {}'.format(move, cnr_cx, skip, stbl))
+
+        score = cnr_cx + skip + stbl
+        sortedMoves.append((score, move))
+
+    return sorted(sortedMoves)
+
+
+def printSorted(board, token):
+    oppTkn = getOppToken(token)
+    canMove, possMoves = nextMoves(board, token)
+    print(sortMoves(token, oppTkn, board, possMoves))
+
 
 # run
-
-if startTkns == '':
-    startTkns, oppTkn = nextTokens(startboard)
-else:
-    oppTkn = getOppToken(startTkns)
-canMove, possMoves = nextMoves(startboard, startTkns)
-if canMove == False:
-    canMove, possMoves = nextMoves(startboard, oppTkn)
-    startTkns, oppTkn = oppTkn, startTkns
-
-if len(moveList) == 0:
-    xTokens, oTokens = getScore(startboard)
-    printPossMoves(startboard, possMoves)
-    print('\n' + startboard + ' {}/{}'.format(xTokens, oTokens))
-    if canMove:
-        print('Possible moves for {}: {}'.format(startTkns, possMoves))
-
-else:
-    xTokens, oTokens = getScore(startboard)
-    canMove, possMoves = nextMoves(startboard, startTkns)
-    printBoard(startboard)
-    print('\n' + startboard + ' {}/{}'.format(xTokens, oTokens))
-    if canMove:
-        print('Possible moves for {}: {}'.format(startTkns, possMoves))
-    for movePos in moveList:
-        if movePos < 0: continue
-        startTkns, oppTkn, startboard = play(startTkns, oppTkn, movePos, startboard)
+print(nextMoves(startboard, startTkn)[1])
+printSorted(startboard, startTkn)

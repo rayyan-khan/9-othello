@@ -1,0 +1,1000 @@
+C:\Users\rayya\Desktop\AI\9 othello\lab3>python moveSequence2.py 44 45 46 52 59 47 26 18 53 43 37 19 42 41 38 61 54 63 62 55 21 33 25 32 49 51 60 56 12 58 17 20 57 24 34 48 50 40 13 29 22 11 9 0 1 8 10
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . o x . . .
+. . . x o . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+
+...........................ox......xo........................... 2/2
+Possible moves for x: {26, 19, 44, 37}
+
+Player x moves to 44:
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . o x . . .
+. . . x x . . .
+. . . . x . . .
+. . . . . . . .
+. . . . . . . .
+
+...........................ox......xx.......x................... 4/1
+Possible moves for o: {29, 43, 45}
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . o x * . .
+. . . x x . . .
+. . . * x * . .
+. . . . . . . .
+. . . . . . . .
+
+Player o moves to 45:
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . o x . . .
+. . . x o . . .
+. . . . x o . .
+. . . . . . . .
+. . . . . . . .
+
+...........................ox......xo.......xo.................. 3/3
+Possible moves for x: {26, 19, 37, 46}
+. . . . . . . .
+. . . . . . . .
+. . . * . . . .
+. . * o x . . .
+. . . x o * . .
+. . . . x o * .
+. . . . . . . .
+. . . . . . . .
+
+Player x moves to 46:
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . o x . . .
+. . . x o . . .
+. . . . x x x .
+. . . . . . . .
+. . . . . . . .
+
+...........................ox......xo.......xxx................. 5/2
+Possible moves for o: {34, 43, 52, 20, 54, 29}
+. . . . . . . .
+. . . . . . . .
+. . . . * . . .
+. . . o x * . .
+. . * x o . . .
+. . . * x x x .
+. . . . * . * .
+. . . . . . . .
+
+Player o moves to 52:
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . o x . . .
+. . . x o . . .
+. . . . o x x .
+. . . . o . . .
+. . . . . . . .
+
+...........................ox......xo.......oxx.....o........... 4/4
+Possible moves for x: {37, 43, 18, 19, 53, 26, 59, 60}
+. . . . . . . .
+. . . . . . . .
+. . * * . . . .
+. . * o x . . .
+. . . x o * . .
+. . . * o x x .
+. . . . o * . .
+. . . * * . . .
+
+Player x moves to 59:
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . o x . . .
+. . . x o . . .
+. . . . o x x .
+. . . . x . . .
+. . . x . . . .
+
+...........................ox......xo.......oxx.....x......x.... 6/3
+Possible moves for o: {34, 43, 47, 20, 54, 26, 60, 29}
+. . . . . . . .
+. . . . . . . .
+. . . . * . . .
+. . * o x * . .
+. . * x o . . .
+. . . * o x x *
+. . . . x . * .
+. . . x * . . .
+
+Player o moves to 47:
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . o x . . .
+. . . x o . . .
+. . . . o o o o
+. . . . x . . .
+. . . x . . . .
+
+...........................ox......xo.......oooo....x......x.... 4/6
+Possible moves for x: {37, 38, 19, 53, 26}
+. . . . . . . .
+. . . . . . . .
+. . . * . . . .
+. . * o x . . .
+. . . x o * * .
+. . . . o o o o
+. . . . x * . .
+. . . x . . . .
+
+Player x moves to 26:
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . x x x . . .
+. . . x o . . .
+. . . . o o o o
+. . . . x . . .
+. . . x . . . .
+
+..........................xxx......xo.......oooo....x......x.... 6/5
+Possible moves for o: {34, 17, 18, 20, 60}
+. . . . . . . .
+. . . . . . . .
+. * * . * . . .
+. . x x x . . .
+. . * x o . . .
+. . . . o o o o
+. . . . x . . .
+. . . x * . . .
+
+Player o moves to 18:
+. . . . . . . .
+. . . . . . . .
+. . o . . . . .
+. . x o x . . .
+. . . x o . . .
+. . . . o o o o
+. . . . x . . .
+. . . x . . . .
+
+..................o.......xox......xo.......oooo....x......x.... 5/7
+Possible moves for x: {37, 38, 10, 19, 53}
+. . . . . . . .
+. . * . . . . .
+. . o * . . . .
+. . x o x . . .
+. . . x o * * .
+. . . . o o o o
+. . . . x * . .
+. . . x . . . .
+
+Player x moves to 53:
+. . . . . . . .
+. . . . . . . .
+. . o . . . . .
+. . x o x . . .
+. . . x o . . .
+. . . . x o o o
+. . . . x x . .
+. . . x . . . .
+
+..................o.......xox......xo.......xooo....xx.....x.... 7/6
+Possible moves for o: {34, 43, 29, 20, 25, 60, 61}
+. . . . . . . .
+. . . . . . . .
+. . o . * . . .
+. * x o x * . .
+. . * x o . . .
+. . . * x o o o
+. . . . x x . .
+. . . x * * . .
+
+Player o moves to 43:
+. . . . . . . .
+. . . . . . . .
+. . o . . . . .
+. . x o x . . .
+. . . o o . . .
+. . . o o o o o
+. . . . x x . .
+. . . x . . . .
+
+..................o.......xox......oo......ooooo....xx.....x.... 5/9
+Possible moves for x: {34, 37, 38, 39, 42, 10}
+. . . . . . . .
+. . * . . . . .
+. . o . . . . .
+. . x o x . . .
+. . * o o * * *
+. . * o o o o o
+. . . . x x . .
+. . . x . . . .
+
+Player x moves to 37:
+. . . . . . . .
+. . . . . . . .
+. . o . . . . .
+. . x o x . . .
+. . . o o x . .
+. . . o o x o o
+. . . . x x . .
+. . . x . . . .
+
+..................o.......xox......oox.....ooxoo....xx.....x.... 7/8
+Possible moves for o: {34, 38, 17, 29, 19, 20, 21, 54, 62, 25, 60, 61, 30}
+. . . . . . . .
+. . . . . . . .
+. * o * * * . .
+. * x o x * * .
+. . * o o x * .
+. . . o o x o o
+. . . . x x * .
+. . . x * * * .
+
+Player o moves to 19:
+. . . . . . . .
+. . . . . . . .
+. . o o . . . .
+. . x o o . . .
+. . . o o o . .
+. . . o o x o o
+. . . . x x . .
+. . . x . . . .
+
+..................oo......xoo......ooo.....ooxoo....xx.....x.... 5/11
+Possible moves for x: {34, 39, 9, 42, 10, 12, 20, 29}
+. . . . . . . .
+. * * . * . . .
+. . o o * . . .
+. . x o o * . .
+. . * o o o . *
+. . * o o x o o
+. . . . x x . .
+. . . x . . . .
+
+Player x moves to 42:
+. . . . . . . .
+. . . . . . . .
+. . o o . . . .
+. . x o o . . .
+. . . o o o . .
+. . x x x x o o
+. . . . x x . .
+. . . x . . . .
+
+..................oo......xoo......ooo....xxxxoo....xx.....x.... 8/9
+Possible moves for o: {33, 34, 41, 49, 50, 51, 17, 54, 25, 60, 61, 62}
+. . . . . . . .
+. . . . . . . .
+. * o o . . . .
+. * x o o . . .
+. * * o o o . .
+. * x x x x o o
+. * * * x x * .
+. . . x * * * .
+
+Player o moves to 41:
+. . . . . . . .
+. . . . . . . .
+. . o o . . . .
+. . x o o . . .
+. . . o o o . .
+. o o o o o o o
+. . . . x x . .
+. . . x . . . .
+
+..................oo......xoo......ooo...ooooooo....xx.....x.... 4/14
+Possible moves for x: {34, 38, 39, 10, 12, 20, 29}
+. . . . . . . .
+. . * . * . . .
+. . o o * . . .
+. . x o o * . .
+. . * o o o * *
+. o o o o o o o
+. . . . x x . .
+. . . x . . . .
+
+Player x moves to 38:
+. . . . . . . .
+. . . . . . . .
+. . o o . . . .
+. . x o o . . .
+. . . o o o x .
+. o o o o x o o
+. . . . x x . .
+. . . x . . . .
+
+..................oo......xoo......ooox..ooooxoo....xx.....x.... 6/13
+Possible moves for o: {33, 34, 39, 17, 61, 54, 62, 25, 60, 29, 30}
+. . . . . . . .
+. . . . . . . .
+. * o o . . . .
+. * x o o * * .
+. * * o o o x *
+. o o o o x o o
+. . . . x x * .
+. . . x * * * .
+
+Player o moves to 61:
+. . . . . . . .
+. . . . . . . .
+. . o o . . . .
+. . x o o . . .
+. . . o o o x .
+. o o o o o o o
+. . . . o o . .
+. . . x . o . .
+
+..................oo......xoo......ooox..ooooooo....oo.....x.o.. 3/17
+Possible moves for x: {34, 10, 12, 54, 29, 62}
+. . . . . . . .
+. . * . * . . .
+. . o o . . . .
+. . x o o * . .
+. . * o o o x .
+. o o o o o o o
+. . . . o o * .
+. . . x . o * .
+
+Player x moves to 54:
+. . . . . . . .
+. . . . . . . .
+. . o o . . . .
+. . x o o . . .
+. . . o o o x .
+. o o o o o x o
+. . . . o o x .
+. . . x . o . .
+
+..................oo......xoo......ooox..oooooxo....oox....x.o.. 5/16
+Possible moves for o: {33, 34, 39, 17, 55, 25, 31, 29, 63}
+. . . . . . . .
+. . . . . . . .
+. * o o . . . .
+. * x o o * . *
+. * * o o o x *
+. o o o o o x o
+. . . . o o x *
+. . . x . o . *
+
+Player o moves to 63:
+. . . . . . . .
+. . . . . . . .
+. . o o . . . .
+. . x o o . . .
+. . . o o o x .
+. o o o o o x o
+. . . . o o o .
+. . . x . o . o
+
+..................oo......xoo......ooox..oooooxo....ooo....x.o.o 4/18
+Possible moves for x: {34, 40, 10, 12, 60, 29, 62}
+. . . . . . . .
+. . * . * . . .
+. . o o . . . .
+. . x o o * . .
+. . * o o o x .
+* o o o o o x o
+. . . . o o o .
+. . . x * o * o
+
+Player x moves to 62:
+. . . . . . . .
+. . . . . . . .
+. . o o . . . .
+. . x o o . . .
+. . . x o o x .
+. o o o x o x o
+. . . . o x x .
+. . . x . o x o
+
+..................oo......xoo......xoox..oooxoxo....oxx....x.oxo 9/14
+Possible moves for o: {33, 34, 39, 51, 55, 25, 29, 31}
+. . . . . . . .
+. . . . . . . .
+. . o o . . . .
+. * x o o * . *
+. * * x o o x *
+. o o o x o x o
+. . . * o x x *
+. . . x . o x o
+
+Player o moves to 55:
+. . . . . . . .
+. . . . . . . .
+. . o o . . . .
+. . x o o . . .
+. . . x o o x .
+. o o o x o o o
+. . . . o o o o
+. . . x . o x o
+
+..................oo......xoo......xoox..oooxooo....oooo...x.oxo 6/18
+Possible moves for x: {40, 10, 11, 12, 49, 51, 20, 21, 60, 29, 30}
+. . . . . . . .
+. . * * * . . .
+. . o o * * . .
+. . x o o * * .
+. . . x o o x .
+* o o o x o o o
+. * . * o o o o
+. . . x * o x o
+
+Player x moves to 21:
+. . . . . . . .
+. . . . . . . .
+. . o o . x . .
+. . x o x . . .
+. . . x o o x .
+. o o o x o o o
+. . . . o o o o
+. . . x . o x o
+
+..................oo.x....xox......xoox..oooxooo....oooo...x.oxo 8/17
+Possible moves for o: {33, 34, 39, 14, 17, 51, 20, 25, 29, 30, 31}
+. . . . . . . .
+. . . . . . * .
+. * o o * x . .
+. * x o x * * *
+. * * x o o x *
+. o o o x o o o
+. . . * o o o o
+. . . x . o x o
+
+Player o moves to 33:
+. . . . . . . .
+. . . . . . . .
+. . o o . x . .
+. . o o x . . .
+. o . x o o x .
+. o o o x o o o
+. . . . o o o o
+. . . x . o x o
+
+..................oo.x....oox....o.xoox..oooxooo....oooo...x.oxo 7/19
+Possible moves for x: {40, 10, 11, 49, 17, 51, 25, 60, 30}
+. . . . . . . .
+. . * * . . . .
+. * o o . x . .
+. * o o x . * .
+. o . x o o x .
+* o o o x o o o
+. * . * o o o o
+. . . x * o x o
+
+Player x moves to 25:
+. . . . . . . .
+. . . . . . . .
+. . o o . x . .
+. x x x x . . .
+. o . x o o x .
+. o o o x o o o
+. . . . o o o o
+. . . x . o x o
+
+..................oo.x...xxxx....o.xoox..oooxooo....oooo...x.oxo 10/17
+Possible moves for o: {32, 34, 39, 14, 17, 51, 20, 29, 30, 31}
+. . . . . . . .
+. . . . . . * .
+. * o o * x . .
+. x x x x * * *
+* o * x o o x *
+. o o o x o o o
+. . . * o o o o
+. . . x . o x o
+
+Player o moves to 32:
+. . . . . . . .
+. . . . . . . .
+. . o o . x . .
+. o x x x . . .
+o o . x o o x .
+. o o o x o o o
+. . . . o o o o
+. . . x . o x o
+
+..................oo.x...oxxx...oo.xoox..oooxooo....oooo...x.oxo 9/19
+Possible moves for x: {40, 9, 10, 11, 12, 49, 51, 24, 60, 30}
+. . . . . . . .
+. * * * * . . .
+. . o o . x . .
+* o x x x . * .
+o o . x o o x .
+* o o o x o o o
+. * . * o o o o
+. . . x * o x o
+
+Player x moves to 49:
+. . . . . . . .
+. . . . . . . .
+. . o o . x . .
+. o x x x . . .
+o o . x o o x .
+. o x o x o o o
+. x . . o o o o
+. . . x . o x o
+
+..................oo.x...oxxx...oo.xoox..oxoxooo.x..oooo...x.oxo 11/18
+Possible moves for o: {34, 39, 17, 51, 20, 57, 29, 30, 31}
+. . . . . . . .
+. . . . . . . .
+. * o o * x . .
+. o x x x * * *
+o o * x o o x *
+. o x o x o o o
+. x . * o o o o
+. * . x . o x o
+
+Player o moves to 51:
+. . . . . . . .
+. . . . . . . .
+. . o o . x . .
+. o x x x . . .
+o o . x o o x .
+. o o o o o o o
+. x . o o o o o
+. . . x . o x o
+
+..................oo.x...oxxx...oo.xoox..ooooooo.x.ooooo...x.oxo 9/21
+Possible moves for x: {40, 9, 10, 11, 12, 17, 24, 60}
+. . . . . . . .
+. * * * * . . .
+. * o o . x . .
+* o x x x . . .
+o o . x o o x .
+* o o o o o o o
+. x . o o o o o
+. . . x * o x o
+
+Player x moves to 60:
+. . . . . . . .
+. . . . . . . .
+. . o o . x . .
+. o x x x . . .
+o o . x x o x .
+. o o o x o o o
+. x . o x o o o
+. . . x x x x o
+
+..................oo.x...oxxx...oo.xxox..oooxooo.x.oxooo...xxxxo 14/17
+Possible moves for o: {34, 39, 14, 17, 56, 57, 58, 29, 30, 31}
+. . . . . . . .
+. . . . . . * .
+. * o o . x . .
+. o x x x * * *
+o o * x x o x *
+. o o o x o o o
+. x . o x o o o
+* * * x x x x o
+
+Player o moves to 56:
+. . . . . . . .
+. . . . . . . .
+. . o o . x . .
+. o x x x . . .
+o o . x x o x .
+. o o o x o o o
+. o . o x o o o
+o . . x x x x o
+
+..................oo.x...oxxx...oo.xxox..oooxooo.o.oxoooo..xxxxo 13/19
+Possible moves for x: {34, 39, 40, 9, 10, 11, 12, 50, 24, 58, 29, 30}
+. . . . . . . .
+. * * * * . . .
+. . o o . x . .
+* o x x x * * .
+o o * x x o x *
+* o o o x o o o
+. o * o x o o o
+o . * x x x x o
+
+Player x moves to 12:
+. . . . . . . .
+. . . . x . . .
+. . o x . x . .
+. o x x x . . .
+o o . x x o x .
+. o o o x o o o
+. o . o x o o o
+o . . x x x x o
+
+............x.....ox.x...oxxx...oo.xxox..oooxooo.o.oxoooo..xxxxo 15/18
+Possible moves for o: {34, 5, 39, 10, 11, 14, 17, 20, 58, 29, 30, 31}
+. . . . . * . .
+. . * * x . * .
+. * o x * x . .
+. o x x x * * *
+o o * x x o x *
+. o o o x o o o
+. o . o x o o o
+o . * x x x x o
+
+Player o moves to 58:
+. . . . . . . .
+. . . . x . . .
+. . o x . x . .
+. o x x x . . .
+o o . x x o x .
+. o o o x o o o
+. o . o x o o o
+o . o o o o o o
+
+............x.....ox.x...oxxx...oo.xxox..oooxooo.o.oxoooo.oooooo 11/23
+Possible moves for x: {34, 40, 9, 10, 17, 50, 24, 30}
+. . . . . . . .
+. * * . x . . .
+. * o x . x . .
+* o x x x . * .
+o o * x x o x .
+* o o o x o o o
+. o * o x o o o
+o . o o o o o o
+
+Player x moves to 17:
+. . . . . . . .
+. . . . x . . .
+. x x x . x . .
+. o x x x . . .
+o o . x x o x .
+. o o o x o o o
+. o . o x o o o
+o . o o o o o o
+
+............x....xxx.x...oxxx...oo.xxox..oooxooo.o.oxoooo.oooooo 13/22
+Possible moves for o: {34, 5, 39, 8, 9, 10, 11, 14, 20, 29, 30, 31}
+. . . . . * . .
+* * * * x . * .
+. x x x * x . .
+. o x x x * * *
+o o * x x o x *
+. o o o x o o o
+. o . o x o o o
+o . o o o o o o
+
+Player o moves to 20:
+. . . . . . . .
+. . . . x . . .
+. x x x o x . .
+. o x x o . . .
+o o . x o o x .
+. o o o o o o o
+. o . o o o o o
+o . o o o o o o
+
+............x....xxxox...oxxo...oo.xoox..ooooooo.o.oooooo.oooooo 9/27
+Possible moves for x: {40, 13, 24, 57, 29}
+. . . . . . . .
+. . . . x * . .
+. x x x o x . .
+* o x x o * . .
+o o . x o o x .
+* o o o o o o o
+. o . o o o o o
+o * o o o o o o
+
+Player x moves to 57:
+. . . . . . . .
+. . . . x . . .
+. x x x o x . .
+. x x x o . . .
+o x . x o o x .
+. x o o o o o o
+. x . o o o o o
+o x o o o o o o
+
+............x....xxxox...xxxo...ox.xoox..xoooooo.x.ooooooxoooooo 14/23
+Possible moves for o: {34, 4, 39, 40, 8, 9, 11, 10, 14, 16, 50, 22, 24, 29, 30, 31}
+. . . . * . . .
+* * * * x . * .
+* x x x o x * .
+* x x x o * * *
+o x * x o o x *
+* x o o o o o o
+. x * o o o o o
+o x o o o o o o
+
+Player o moves to 24:
+. . . . . . . .
+. . . . x . . .
+. x x x o x . .
+o o o o o . . .
+o o . x o o x .
+. x o o o o o o
+. x . o o o o o
+o x o o o o o o
+
+............x....xxxox..ooooo...oo.xoox..xoooooo.x.ooooooxoooooo 10/28
+Possible moves for x: {40, 34}
+. . . . . . . .
+. . . . x . . .
+. x x x o x . .
+o o o o o . . .
+o o * x o o x .
+* x o o o o o o
+. x . o o o o o
+o x o o o o o o
+
+Player x moves to 34:
+. . . . . . . .
+. . . . x . . .
+. x x x o x . .
+o o x o o . . .
+o o x x o o x .
+. x o o o o o o
+. x . o o o o o
+o x o o o o o o
+
+............x....xxxox..ooxoo...ooxxoox..xoooooo.x.ooooooxoooooo 12/27
+Possible moves for o: {4, 5, 39, 40, 8, 9, 10, 11, 14, 48, 16, 50, 22, 29, 30, 31}
+. . . . * * . .
+* * * * x . * .
+* x x x o x * .
+o o x o o * * *
+o o x x o o x *
+* x o o o o o o
+* x * o o o o o
+o x o o o o o o
+
+Player o moves to 48:
+. . . . . . . .
+. . . . x . . .
+. x x x o x . .
+o o x o o . . .
+o o o x o o x .
+. o o o o o o o
+o x . o o o o o
+o x o o o o o o
+
+............x....xxxox..ooxoo...oooxoox..oooooooox.ooooooxoooooo 10/30
+Possible moves for x: {40, 50, 29}
+. . . . . . . .
+. . . . x . . .
+. x x x o x . .
+o o x o o * . .
+o o o x o o x .
+* o o o o o o o
+o x * o o o o o
+o x o o o o o o
+
+Player x moves to 50:
+. . . . . . . .
+. . . . x . . .
+. x x x o x . .
+o o x o o . . .
+o o x x o o x .
+. o x o o o o o
+o x x o o o o o
+o x o o o o o o
+
+............x....xxxox..ooxoo...ooxxoox..oxooooooxxooooooxoooooo 13/28
+Possible moves for o: {4, 5, 39, 8, 9, 10, 11, 40, 14, 16, 22, 29, 30, 31}
+. . . . * * . .
+* * * * x . * .
+* x x x o x * .
+o o x o o * * *
+o o x x o o x *
+* o x o o o o o
+o x x o o o o o
+o x o o o o o o
+
+Player o moves to 40:
+. . . . . . . .
+. . . . x . . .
+. x x x o x . .
+o o x o o . . .
+o o x x o o x .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+............x....xxxox..ooxoo...ooxxoox.ooxoooooooxooooooxoooooo 12/30
+Possible moves for x: {16, 29, 13}
+. . . . . . . .
+. . . . x * . .
+* x x x o x . .
+o o x o o * . .
+o o x x o o x .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+Player x moves to 13:
+. . . . . . . .
+. . . . x x . .
+. x x x x x . .
+o o x x o . . .
+o o x x o o x .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+............xx...xxxxx..ooxxo...ooxxoox.ooxoooooooxooooooxoooooo 15/28
+Possible moves for o: {4, 5, 6, 39, 8, 9, 10, 11, 14, 29, 30, 31}
+. . . . * * * .
+* * * * x x * .
+. x x x x x . .
+o o x x o * * *
+o o x x o o x *
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+Player o moves to 29:
+. . . . . . . .
+. . . . x x . .
+. x x x x x . .
+o o x x o o . .
+o o x x o o o .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+............xx...xxxxx..ooxxoo..ooxxooo.ooxoooooooxooooooxoooooo 14/30
+Possible moves for x: {16, 39, 22, 30}
+. . . . . . . .
+. . . . x x . .
+* x x x x x * .
+o o x x o o * .
+o o x x o o o *
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+Player x moves to 22:
+. . . . . . . .
+. . . . x x . .
+. x x x x x x .
+o o x x o x . .
+o o x x x o o .
+o o x x o o o o
+o o x o o o o o
+o x o o o o o o
+
+............xx...xxxxxx.ooxxox..ooxxxoo.ooxxooooooxooooooxoooooo 18/27
+Possible moves for o: {4, 5, 6, 8, 9, 10, 11, 14, 30}
+. . . . * * * .
+* * * * x x * .
+. x x x x x x .
+o o x x o x * .
+o o x x x o o .
+o o x x o o o o
+o o x o o o o o
+o x o o o o o o
+
+Player o moves to 11:
+. . . . . . . .
+. . . o x x . .
+. x o o o x x .
+o o x o o o . .
+o o x o x o o .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+...........oxx...xoooxx.ooxooo..ooxoxoo.ooxoooooooxooooooxoooooo 11/35
+Possible moves for x: {39, 9, 10, 16, 30}
+. . . . . . . .
+. * * o x x . .
+* x o o o x x .
+o o x o o o * .
+o o x o x o o *
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+Player x moves to 9:
+. . . . . . . .
+. x . o x x . .
+. x x o o x x .
+o o x x o o . .
+o o x o x o o .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+.........x.oxx...xxooxx.ooxxoo..ooxoxoo.ooxoooooooxooooooxoooooo 14/33
+Possible moves for o: {0, 1, 4, 5, 6, 8, 10, 14, 15, 16, 23}
+* * . . * * * .
+* x * o x x * *
+* x x o o x x *
+o o x x o o . .
+o o x o x o o .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+Player o moves to 0:
+o . . . . . . .
+. o . o x x . .
+. x o o o x x .
+o o x o o o . .
+o o x o o o o .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+o........o.oxx...xoooxx.ooxooo..ooxoooo.ooxoooooooxooooooxoooooo 10/38
+Possible moves for x: {1, 39, 10, 16, 30}
+o * . . . . . .
+. o * o x x . .
+* x o o o x x .
+o o x o o o * .
+o o x o o o o *
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+Player x moves to 1:
+o x . . . . . .
+. x . o x x . .
+. x o o o x x .
+o o x o o o . .
+o o x o o o o .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+ox.......x.oxx...xoooxx.ooxooo..ooxoooo.ooxoooooooxooooooxoooooo 12/37
+Possible moves for o: {2, 4, 5, 6, 8, 10, 14, 15, 16, 23}
+o x * . * * * .
+* x * o x x * *
+* x o o o x x *
+o o x o o o . .
+o o x o o o o .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+Player o moves to 8:
+o x . . . . . .
+o x . o x x . .
+. o o o o x x .
+o o o o o o . .
+o o x o o o o .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+ox......ox.oxx...ooooxx.oooooo..ooxoooo.ooxoooooooxooooooxoooooo 10/40
+Possible moves for x: {16, 10, 39}
+o x . . . . . .
+o x * o x x . .
+* o o o o x x .
+o o o o o o . .
+o o x o o o o *
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+Player x moves to 10:
+o x . . . . . .
+o x x x x x . .
+. o x o o x x .
+o o x o o o . .
+o o x o o o o .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+
+ox......oxxxxx...oxooxx.ooxooo..ooxoooo.ooxoooooooxooooooxoooooo 14/37
+Possible moves for o: {2, 3, 4, 5, 6, 14, 15, 23}
+o x * * * * * .
+o x x x x x * *
+. o x o o x x *
+o o x o o o . .
+o o x o o o o .
+o o x o o o o o
+o o x o o o o o
+o x o o o o o o
+

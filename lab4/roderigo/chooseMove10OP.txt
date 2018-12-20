@@ -1,0 +1,44 @@
+C:\Users\rayya\Desktop\AI\9 othello\lab4\corners+stability+mobility>python chooseMove10.py ooooooooooooooo.xooox...oxooxxxoooxoxxoooooxxoooooooxo..oooo.o.. o
+{60, 21, 22, 23}
+[(0.9545454545454546, 23), (0.967391304347826, 21), (0.967391304347826, 60), (0.9777777777777777, 22)]
+
+C:\Users\rayya\Desktop\AI\9 othello\lab4\corners+stability+mobility>python chooseMove10.py ooooooooooooooo.xooox.oxoxooxoxoooxooxooooooxoooooooxo..oooo.o.. o
+{60, 21, 15}
+[(0.9432624113475178, 60), (0.9583333333333334, 21), (3.967391304347826, 15)]
+
+C:\Users\rayya\Desktop\AI\9 othello\lab4\corners+stability+mobility>python chooseMove10.py ooooooooooooooo.xooox.oxoxooxoxoooxooxooooooxoooooooxo..oooo.o.. o
+{60, 21, 15}
+[(0.9432624113475178, 60), (0.9583333333333334, 21), (3.967391304347826, 15)]
+
+C:\Users\rayya\Desktop\AI\9 othello\lab4\corners+stability+mobility>python chooseMove10.py ooooooooooooooooxooox.oooxooxoxoooxooxooooooxoooooooxx..oooo.ox. o
+{60, 21, 54, 63}
+[(-2.0277777777777777, 54), (0.9727891156462585, 60), (0.9795918367346939, 21), (3.971014492753623, 63)]
+
+C:\Users\rayya\Desktop\AI\9 othello\lab4\corners+stability+mobility>python chooseMove10.py ooooooooooooooooxoooxxoooxooxxxoooxooxooooooxoooooooxx..oooo.ooo o
+{60, 54}
+[(2.4693877551020407, 60), (3.2291666666666665, 54)]
+
+C:\Users\rayya\Desktop\AI\9 othello\lab4\corners+stability+mobility>python chooseMove10.py ...........oxx...xoooxx.ooxooo..ooxoxoo.ooxoooooooxooooooxoooooo x
+{39, 9, 10, 16, 30}
+[(-4.166666666666667, 9), (-1.1533333333333333, 30), (-1.1452991452991452, 16), (-1.1349206349206349, 10), (-1.1142857142857143, 39)]
+
+C:\Users\rayya\Desktop\AI\9 othello\lab4\corners+stability+mobility>python chooseMove10.py ...........oxx...xoooxx.ooxooo..ooxoxoo.ooxoooooooxooooooxoooooo o
+{4, 5, 6, 8, 9, 10, 14, 15, 16, 23}
+[(-2.085714285714286, 9), (-2.0486486486486486, 14), (-1.3680555555555556, 8), (-1.3071428571428572, 6), (-1.3071428571428572, 15), (0.8642857142857143, 10), (0.9371428571428572, 4), (0.9513513513513514, 5), (2.4, 16), (2.438888888888889, 23)]
+
+C:\Users\rayya\Desktop\AI\9 othello\lab4\corners+stability+mobility>python chooseMove10.py .........x.oxx...xxooxx.ooxxoo..ooxoxoo.ooxoooooooxooooooxoooooo o
+{0, 1, 4, 5, 6, 8, 10, 14, 15, 16, 23}
+[(-2.0685714285714285, 14), (-1.3005050505050506, 6), (-1.2990196078431373, 1), (-1.2990196078431373, 8), (-1.2954545454545454, 15), (0.9314285714285714, 5), (0.9393939393939394, 4), (0.9473684210526316, 10), (2.4411764705882355, 16), (2.450980392156863, 23), (3.928571428571429, 0)]
+
+C:\Users\rayya\Desktop\AI\9 othello\lab4\corners+stability+mobility>python chooseMove10.py .........x.oxx...xxooxx.ooxxoo..ooxoxoo.ooxoooooooxooooooxoooooo x
+{3, 4, 39, 10, 16, 30}
+[(-1.1818181818181819, 30), (-1.16875, 16), (-1.1657754010695187, 3), (-1.15, 4), (-1.1443850267379678, 39), (-1.1375, 10)]
+
+C:\Users\rayya\Desktop\AI\9 othello\lab4\corners+stability+mobility>python chooseMove10.py .........x.oxx...xxooxx.ooxxoo..ooxoxoo.ooxoooooooxooooooxoooooo o
+{0, 1, 4, 5, 6, 8, 10, 14, 15, 16, 23}
+[(-2.0685714285714285, 14), (-1.3005050505050506, 6), (-1.2990196078431373, 1), (-1.2990196078431373, 8), (-1.2954545454545454, 15), (0.9314285714285714, 5), (0.9393939393939394, 4), (0.9473684210526316, 10), (2.4411764705882355, 16), (2.450980392156863, 23), (3.928571428571429, 0)]
+
+C:\Users\rayya\Desktop\AI\9 othello\lab4\corners+stability+mobility>python chooseMove10.py ox......oxxxxx...oxooxx.ooxooo..ooxoooo.ooxoooooooxooooooxoooooo o
+{2, 3, 4, 5, 6, 14, 15, 23}
+[(-2.073170731707317, 14), (-1.3333333333333335, 6), (-1.3333333333333335, 15), (0.8947368421052632, 4), (0.9069767441860466, 2), (0.9189189189189189, 3), (0.9210526315789473, 5), (2.40990990990991, 23)]
+

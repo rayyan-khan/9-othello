@@ -1,7 +1,6 @@
 import sys
-import operator
 
-# 75%
+# 77%
 
 # inputs from sys
 startboard = sys.argv[1].lower()
@@ -18,9 +17,8 @@ CNR_EDGES = {0: {1,2,3,4,5,6,7,8,16,24,32,40,48,56}, 7: {0,1,2,3,4,5,6,15,23,31,
          56: {0,8,16,24,32,40,48,57,58,59,60,61,62,63}, 63: {7,15,23,31,39,47,55,56,57,58,59,60,61,62}}
 EDGE_CNR = {edgeInd: corner for corner in CNR_EDGES for edgeInd in CNR_EDGES[corner]}
 CORNERS = {0, 7, 56, 63}
-CX = {1: 0, 8: 0, 9: 0, 6: 7, 14: 7, 15: 7, 48: 56, 49: 56, 57: 56, 54: 63, 55: 63, 62: 63}
-
-
+CX_d = {1: 0, 8: 0, 9: 0, 6: 7, 14: 7, 15: 7, 48: 56, 49: 56, 57: 56, 54: 63, 55: 63, 62: 63}
+CX = {1, 8, 9, 6, 14, 15, 48, 49, 57, 54, 55, 62}
 
 # setting up NBRS -- part 1
 idxs = [i for i in range(0, len(startboard))]
@@ -154,8 +152,8 @@ def makeFlips(board, token, position):
             subset = SUBSETS[opp][position]
             changes = set(subset[:subset.index(idx) + 1] + [position, opp])
             numChanges += len(changes)
-            TKNSETS[token] = TKNSETS[token].union(changes) - CORNERS
-            TKNSETS[oppToken] = TKNSETS[oppToken] - changes
+            #TKNSETS[token] = TKNSETS[token].union(changes) - {0, 7, 56, 63}
+            #TKNSETS[oppToken] = TKNSETS[oppToken] - changes
             board = ''.join([ch if ind not in changes else token for ind, ch in enumerate(board)])
     return board, numChanges
 
@@ -164,48 +162,54 @@ def sortMoves(token, oppTkn, board, possMoves):
     # remember that the grader looks at the last int printed, so
     # print the best move last -- ascending order in this case
     sortedMoves = []
-    boardProgress = 64 - board.count('.')
     for move in possMoves:
-        isCorner = 0
-        isEdge = 0
-        isCX = 0
-        numChanges = 0
-        oppSkip = 0
+        score = 0
+        #flippedBoard, changes = makeFlips(board, token, move)
+        #oppCanMove, oppPossMoves = nextMoves(flippedBoard, oppTkn)
 
-        # if you're near the end of the game flip as many as possible?
-        changes, flippedBoard = makeFlips(board, token, move)
-        if boardProgress > 32:
-            # note: check if token sets are being modified correctly
-            numChanges = changes
-
-        # if the move results in a pass for the other side try to prioritize it
         oppCanMove, oppPossMoves = nextMoves(startboard, startTkn)
+
         if not oppCanMove:
-            oppSkip = 1
+            # if move leads to a pass for the opponent
+            score += 2
+
+        elif len(CORNERS.union(oppPossMoves)) > 0:
+            # if move allows opponent to move into a corner
+            # that is empty
+            score -= 2
+            
+        if len(CX.intersection(oppPossMoves)) > 0:
+            # if move allows opponent to move into a CX
+            #print('CX:', CX.intersection(oppPossMoves))
+            #print(CX.intersection(oppPossMoves))
+            for pos in CX.intersection(oppPossMoves):
+                if board[CX_d[pos]] == '.':
+                    score -= 1
 
         # just checking for corners and edges and stuff like that
         if move in CORNERS:
-            isCorner = 1
+            score += 3
         elif move in EDGE_CNR:
             if board[EDGE_CNR[move]] == token:
-                isEdge = 1
-            else:
-                isEdge = -1
-        if move in CX:
-            if board[CX[move]] == '.':
-                isCX = -2
-            elif board[CX[move]] == oppTkn:
-                isCX = -1
+                score += 1
+        if move in CX_d:
+            if board[CX_d[move]] == '.':
+                score = -100
+            elif board[CX_d[move]] == oppTkn:
+                score = -99
 
-        sortedMoves.append((isCorner, isCX, isEdge, oppSkip, numChanges, move))
+        sortedMoves.append((score, move))
 
-    return sorted(sortedMoves, key=operator.itemgetter(0, 1, 2, 3, 4, 5))
+    return sorted(sortedMoves)
 
 
 def printSorted(board, token):
     oppTkn = getOppToken(token)
     canMove, possMoves = nextMoves(board, token)
-    print(sortMoves(token, oppTkn, board, possMoves))
+    if len(possMoves) == 1:
+        print(possMoves)
+    else:
+        print(sortMoves(token, oppTkn, board, possMoves))
 
 
 # run

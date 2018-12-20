@@ -1,6 +1,7 @@
 import sys
+import operator
 
-# continuation of chooseMove4
+# 72%
 
 # inputs from sys
 startboard = sys.argv[1].lower()
@@ -153,7 +154,7 @@ def makeFlips(board, token, position):
             subset = SUBSETS[opp][position]
             changes = set(subset[:subset.index(idx) + 1] + [position, opp])
             numChanges += len(changes)
-            TKNSETS[token] = TKNSETS[token].union(changes) - {0, 7, 56, 63}
+            TKNSETS[token] = TKNSETS[token].union(changes) - CORNERS
             TKNSETS[oppToken] = TKNSETS[oppToken] - changes
             board = ''.join([ch if ind not in changes else token for ind, ch in enumerate(board)])
     return board, numChanges
@@ -163,34 +164,42 @@ def sortMoves(token, oppTkn, board, possMoves):
     # remember that the grader looks at the last int printed, so
     # print the best move last -- ascending order in this case
     sortedMoves = []
-    #boardProgress = 64 - board.count('.')
+    boardProgress = 64 - board.count('.')
     for move in possMoves:
-        score = 0
-        #flippedBoard, numChanges = makeFlips(board, token, move)
+        isCorner = 0
+        isEdge = 0
+        isCX = 0
+        numChanges = 0
+        oppSkip = 0
 
-        # if near the end of the game try to flip as many as possible
-        #if boardProgress >= 32:
-        #    score += numChanges
+        # if you're near the end of the game flip as many as possible?
+        changes, flippedBoard = makeFlips(board, token, move)
+        if boardProgress > 32:
+            # note: check if token sets are being modified correctly
+            numChanges = changes
 
+        # if the move results in a pass for the other side try to prioritize it
         oppCanMove, oppPossMoves = nextMoves(startboard, startTkn)
         if not oppCanMove:
-            score += 2
+            oppSkip = 1
 
         # just checking for corners and edges and stuff like that
         if move in CORNERS:
-            score += 2
+            isCorner = 1
         elif move in EDGE_CNR:
             if board[EDGE_CNR[move]] == token:
-                score += 1
+                isEdge = 1
+            else:
+                isEdge = -1
         if move in CX:
             if board[CX[move]] == '.':
-                score = -100
+                isCX = -2
             elif board[CX[move]] == oppTkn:
-                score = -99
+                isCX = -1
 
-        sortedMoves.append((score, move))
+        sortedMoves.append((isCorner, isCX, isEdge, oppSkip, numChanges, move))
 
-    return sorted(sortedMoves)
+    return sorted(sortedMoves, key=operator.itemgetter(0, 1, 2, 3, 4, 5))
 
 
 def printSorted(board, token):

@@ -1,54 +1,59 @@
 import sys
+import time
 
-# 75%
-
+t = time.clock()
 # inputs from sys
 startboard = sys.argv[1].lower()
 startTkn = sys.argv[2].lower()
 
-
 # global variables
-NBRS_flips = {} # NBRS_flips = {index: {adjacent indexes}}
-NBRS_moves = {} # NBRS_moves = {index: {adjacent indexes that moves can be made from}}
-SUBSETS = [] # SUBSETS = [{nbr: [indexes in subset], nbr: [indexes in subset]}, {etc...}]
+NBRS_flips = {}  # NBRS_flips = {index: {adjacent indexes}}
+NBRS_moves = {}  # NBRS_moves = {index: {adjacent indexes that moves can be made from}}
+SUBSETS = []  # SUBSETS = [{nbr: [indexes in subset], nbr: [indexes in subset]}, {etc...}]
 TKNSETS = {'o': {i for i in range(64) if startboard[i] == 'o'} - {0, 7, 56, 63},
-             'x': {i for i in range(64) if startboard[i] == 'x'} - {0, 7, 56, 63}} # set of indexes containing o and x
-CNR_EDGES = {0: {1,2,3,4,5,6,7,8,16,24,32,40,48,56}, 7: {0,1,2,3,4,5,6,15,23,31,39,47,55,63},
-         56: {0,8,16,24,32,40,48,57,58,59,60,61,62,63}, 63: {7,15,23,31,39,47,55,56,57,58,59,60,61,62}}
+           'x': {i for i in range(64) if startboard[i] == 'x'} - {0, 7, 56, 63}}  # set of indexes containing o and x
+CNR_EDGES = {0: {1, 2, 3, 4, 5, 6, 7, 8, 16, 24, 32, 40, 48, 56}, 7: {0, 1, 2, 3, 4, 5, 6, 15, 23, 31, 39, 47, 55, 63},
+             56: {0, 8, 16, 24, 32, 40, 48, 57, 58, 59, 60, 61, 62, 63},
+             63: {7, 15, 23, 31, 39, 47, 55, 56, 57, 58, 59, 60, 61, 62}}
 EDGE_CNR = {edgeInd: corner for corner in CNR_EDGES for edgeInd in CNR_EDGES[corner]}
 CORNERS = {0, 7, 56, 63}
 CX = {1: 0, 8: 0, 9: 0, 6: 7, 14: 7, 15: 7, 48: 56, 49: 56, 57: 56, 54: 63, 55: 63, 62: 63}
 CX_a = {1, 8, 6, 15, 48, 57, 55, 62}
 CX_d = {9, 14, 49, 54}
-
+CNR_row = {0: {1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5},
+           7: {6: 0, 5: 1, 4: 2, 3: 3, 2: 4, 1: 5, 0: 6}}  # remember other two corners
+CNR_col = {0: {8: 0, 16: 1, 24: 2, 32: 3, 40: 4, 48: 5, 56: 6},
+           7: {15: 0, 23: 1, 31: 2, 39: 3, 47: 4, 55: 5, 63: 0}}  # remember other two
+CNR_diag = {0: {1: {2, 9, 16}, 2: {3, 10, 17, 24}, 3: {4, 11, 18, 25, 32},
+                4: {5, 12, 19, 26, 33, 40}, 5: {6, 13, 20, 27, 34, 41, 48},
+                6: {7, 14, 21, 28, 35, 42, 49, 56}}}  # note: finish these later and try not to double count corners
 
 # setting up NBRS -- part 1
 idxs = [i for i in range(0, len(startboard))]
-for index in idxs: # make better later if time/energy/if its worth it
-    if index % 8 == 0: # if its on left edge, don't include anything left
+for index in idxs:  # make better later if time/energy/if its worth it
+    if index % 8 == 0:  # if its on left edge, don't include anything left
         NBRS_flips[index] = {index + 1,
                              index - 8, index + 8,
                              index - 7,
-                             index + 9}\
-            .intersection(idxs) # don't include indexes that don't exist
-    elif index % 8 == 7: # if its on right edge, don't include anything right
+                             index + 9} \
+            .intersection(idxs)  # don't include indexes that don't exist
+    elif index % 8 == 7:  # if its on right edge, don't include anything right
         NBRS_flips[index] = {index - 1,
                              index - 8, index + 8,
                              index + 7,
                              index - 9} \
             .intersection(idxs)
     else:
-        NBRS_flips[index] = {index - 1,index + 1,
+        NBRS_flips[index] = {index - 1, index + 1,
                              index - 8, index + 8,
                              index - 7, index + 7,
                              index - 9, index + 9} \
             .intersection(idxs)
 
-
 # setting up SUBSETS
-for index in idxs: # want a dict for each index
+for index in idxs:  # want a dict for each index
     subDict = {nbr: [] for nbr in NBRS_flips[index]}
-    for nbr in NBRS_flips[index]: # want a key for each neighbor
+    for nbr in NBRS_flips[index]:  # want a key for each neighbor
         # want the value to be a list of the other indexes in the same
         # row/column/diagonal, depending on the relationship between the
         # index and neighbor (which determines whether you're looking at
@@ -65,7 +70,6 @@ for index in idxs: # want a dict for each index
             del subDict[nbr]
     SUBSETS.append(subDict)
 
-
 # taking out NBRS that moves can't be made from
 NBRS_moves = {index: {key for key in SUBSETS[index]} for index in NBRS_flips}
 delInds = {key for key in NBRS_moves if len(NBRS_moves[key]) == 0}
@@ -78,9 +82,9 @@ def getScore(board):
     return board.count('x'), board.count('o')
 
 
-def nextTokens(board): # assuming no passes
-    if board.count('.') % 2: # do better later
-        return 'o', 'x' # next token, token after
+def nextTokens(board):  # assuming no passes
+    if board.count('.') % 2:  # do better later
+        return 'o', 'x'  # next token, token after
     return 'x', 'o'
 
 
@@ -92,7 +96,7 @@ def getOppToken(token):
 
 def printBoard(board):
     for i in range(0, 64, 8):
-        print(' '.join(board[i:i+8]))
+        print(' '.join(board[i:i + 8]))
 
 
 def printPossMoves(board, possMoves):
@@ -116,27 +120,27 @@ def checkBracketing(token, possInd, adjInd, board):
         elif board[index] == token:
             # if you find a bracketing token somewhere along the line
             # then it does form a bracket
-            return index # return the ending index
+            return index  # return the ending index
     # if you get through the entire subset and don't find a bracketing token
     # then too bad
     return -1
 
 
-def nextMoves(board, tokens = ''):
-    possMoves = set() # {indexes that given/default token may make a move at}
+def nextMoves(board, tokens=''):
+    possMoves = set()  # {indexes that given/default token may make a move at}
 
-    if tokens == '': # if token isn't given
-        token, oppToken = nextTokens(board) # assume no passes and find next token
+    if tokens == '':  # if token isn't given
+        token, oppToken = nextTokens(board)  # assume no passes and find next token
     else:
         token, oppToken = tokens, getOppToken(tokens)
 
-    for idx in TKNSETS[oppToken]: # check opposing token indexes
-        for nbr in NBRS_moves[idx]: # check if there are spaces you can move into
+    for idx in TKNSETS[oppToken]:  # check opposing token indexes
+        for nbr in NBRS_moves[idx]:  # check if there are spaces you can move into
             if board[nbr] == '.':
                 if checkBracketing(token, nbr, idx, board) != -1:
                     # if placing here check whether there's another
                     # token down the line it would form a bracket with
-                    possMoves.add(nbr) # if so it's a possible move
+                    possMoves.add(nbr)  # if so it's a possible move
     # if len(possMoves) == 0, then nextMoves[0] == False
     return len(possMoves), possMoves
 
@@ -150,8 +154,8 @@ def makeFlips(board, token, position):
     TKNSETS_copy = TKNSETS.copy()
 
     allChanges = set()
-    for opp in adjOpps: # do better later
-        idx = checkBracketing(token, position, opp, board) # maybe pass in idx rather than re-finding
+    for opp in adjOpps:  # do better later
+        idx = checkBracketing(token, position, opp, board)  # maybe pass in idx rather than re-finding
         if idx > -1:
             subset = SUBSETS[opp][position]
             changes = set(subset[:subset.index(idx) + 1] + [position, opp])
@@ -174,23 +178,99 @@ def CNR_CX(token, oppTkn, board, move):
             cnr_cx = -3
         elif board[CX[move]] == oppTkn:
             cnr_cx = -1
+        else:
+            cnr_cx = 4
     elif move in CX_d:
         if board[CX[move]] == '.':
             cnr_cx = -4
         elif board[CX[move]] == oppTkn:
             cnr_cx = -2
-    return cnr_cx/4
+        else:
+            cnr_cx = 3
+    return cnr_cx / 4
 
 
-def stabletokens(token, oppTkn, oppPossMoves, flippedBoard, tknSet):
+def countDiag(board, token, cnr):
+    furthestIndex = 0
+    prev = 0
+    stableTokens = 0
+    for index in CNR_row[cnr]:
+        if board[index] == token:
+            stableTokens += 1
+            prev = index
+        else:
+            furthestIndex = CNR_row[cnr][prev]
+            break
+    for index in CNR_col[cnr]:
+        if board[index] == token:
+            stableTokens += 1
+            prev = index
+        else:
+            furthestIndex = CNR_col[cnr][prev]
+    if furthestIndex:
+        for diag in range(1, furthestIndex):
+            currentDiag = CNR_diag[cnr][diag]
+            if {board[ind] for ind in currentDiag} == {token}:
+                stableTokens += len(currentDiag)
+            else:
+                break
+    return stableTokens
+
+
+def stableTokens(board, token):
+    stableTokens = 0
+    openSpaces = board.count('.')
+    if openSpaces > 52:
+        return stableTokens
+    else:
+        if {board[0], board[1], board[8]} == {token}:
+            # 0 corner
+            stableTokens += 3
+            if board[9] == token:
+                stableTokens += 1
+            stableTokens += countDiag(board, token, 0)
+
+        if {board[6], board[7], board[15]} == {token}:
+            # 7 corner
+            stableTokens += 3
+            if board[14] == token:
+                stableTokens += 1
+        if {board[48], board[56], board[57]} == {token}:
+            # 56 corner
+            stableTokens += 3
+            if board[49] == token:
+                stableTokens += 1
+        if {board[55], board[62], board[63]} == {token}:
+            # 63 corner
+            stableTokens += 3
+            if board[54] == token:
+                stableTokens += 1
+
+    return stableTokens
+
+
+def stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, tknSet):
     currentTokens = len(tknSet[token])
+    try:
+        tknStable = stableTokens(flippedBoard, token)
+        oppStable = stableTokens(flippedBoard, oppTkn)
+    except:
+        tknStable, oppStable = 0, 0
     if len(oppPossMoves) == 0:
-        return currentTokens
+        #print('Pass')
+        return tknStable
     flippedTokens = 0
     for move in oppPossMoves:
         oppFlipped, oppChanges, newTknSet = makeFlips(flippedBoard, oppTkn, move)
         flippedTokens += len(tknSet[token].intersection(oppChanges))
-    return 1 - flippedTokens/len(oppPossMoves)/currentTokens
+    instability = flippedTokens / len(oppPossMoves) / currentTokens
+    if tknStable + oppStable != 0 and tknStable - oppStable != 0:
+        est = (tknStable - oppStable)/(tknStable + oppStable) - instability
+        #print('Unstable: {} Player stability: {} Opponent Stability: {} Overall est: {}'
+        #      .format(instability, tknStable, oppStable, est))
+        return est
+    else:
+        return 0.5 - instability
 
 
 def sortMoves(token, oppTkn, board, possMoves):
@@ -204,13 +284,13 @@ def sortMoves(token, oppTkn, board, possMoves):
         flippedBoard, changes, TKNSETS_new = makeFlips(board, token, move)
         oppCanMove, oppPossMoves = nextMoves(flippedBoard, oppTkn)
 
-        cnr_cx = CNR_CX(token, oppTkn, board, move)*3
+        cnr_cx = CNR_CX(token, oppTkn, board, move) * 3
         skip = 1 if not oppCanMove else 0
-        stbl = stabletokens(token, oppTkn, oppPossMoves, flippedBoard, TKNSETS_new)
+        stbl = stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, TKNSETS_new)
 
-        print('Move: {} CNR: {} Skip: {} STBL: {}'.format(move, cnr_cx, skip, stbl))
+        #print('Move: {} CNR: {} Skip: {} STBL: {}'.format(move, cnr_cx, skip, stbl))
 
-        score = cnr_cx + skip + stbl
+        score = cnr_cx + stbl + skip
         sortedMoves.append((score, move))
 
     return sorted(sortedMoves)
@@ -219,7 +299,7 @@ def sortMoves(token, oppTkn, board, possMoves):
 def printSorted(board, token):
     oppTkn = getOppToken(token)
     canMove, possMoves = nextMoves(board, token)
-    print(sortMoves(token, oppTkn, board, possMoves))
+    print(sortMoves(token, oppTkn, board, possMoves)[::-1][0][1])
 
 
 # run

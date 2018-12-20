@@ -1,6 +1,6 @@
 import sys
 
-# 75%
+# 62%
 
 # inputs from sys
 startboard = sys.argv[1].lower()
@@ -18,7 +18,7 @@ CNR_EDGES = {0: {1,2,3,4,5,6,7,8,16,24,32,40,48,56}, 7: {0,1,2,3,4,5,6,15,23,31,
 EDGE_CNR = {edgeInd: corner for corner in CNR_EDGES for edgeInd in CNR_EDGES[corner]}
 CORNERS = {0, 7, 56, 63}
 CX = {1: 0, 8: 0, 9: 0, 6: 7, 14: 7, 15: 7, 48: 56, 49: 56, 57: 56, 54: 63, 55: 63, 62: 63}
-
+CX_keys = {1, 8, 9, 6, 14, 15, 48, 49, 57, 54, 55, 62}
 
 
 # setting up NBRS -- part 1
@@ -146,17 +146,17 @@ def makeFlips(board, token, position):
     adjOpps = {nbr for nbr in NBRS_flips[position]
                if board[nbr] == oppToken and position in SUBSETS[nbr]}
 
-    numChanges = 0
+    allChanges = set()
     for opp in adjOpps: # do better later
         idx = checkBracketing(token, position, opp, board) # maybe pass in idx rather than re-finding
         if idx > -1:
             subset = SUBSETS[opp][position]
             changes = set(subset[:subset.index(idx) + 1] + [position, opp])
-            numChanges += len(changes)
+            allChanges = allChanges.union(changes)
             TKNSETS[token] = TKNSETS[token].union(changes) - {0, 7, 56, 63}
             TKNSETS[oppToken] = TKNSETS[oppToken] - changes
             board = ''.join([ch if ind not in changes else token for ind, ch in enumerate(board)])
-    return board, numChanges
+    return board, allChanges
 
 
 def sortMoves(token, oppTkn, board, possMoves):
@@ -166,27 +166,35 @@ def sortMoves(token, oppTkn, board, possMoves):
     #boardProgress = 64 - board.count('.')
     for move in possMoves:
         score = 0
-        #flippedBoard, numChanges = makeFlips(board, token, move)
+        flippedBoard, changes = makeFlips(board, token, move)
 
-        # if near the end of the game try to flip as many as possible
-        #if boardProgress >= 32:
-        #    score += numChanges
+        oppCanMove, oppPossMoves = nextMoves(flippedBoard, oppTkn)
+        # note other versions get this line wrong (I think)
 
-        oppCanMove, oppPossMoves = nextMoves(startboard, startTkn)
+        if len(CORNERS.union(oppPossMoves)) > 0:
+            score -= 1
+
         if not oppCanMove:
-            score += 2
+            score += 3
 
         # just checking for corners and edges and stuff like that
         if move in CORNERS:
-            score += 2
+            score += 5
         elif move in EDGE_CNR:
             if board[EDGE_CNR[move]] == token:
-                score += 1
+                score += 2
         if move in CX:
             if board[CX[move]] == '.':
                 score = -100
             elif board[CX[move]] == oppTkn:
                 score = -99
+        elif len(changes.intersection(CX_keys)) > 0:
+            print('overlap', changes.intersection(CX_keys))
+            for pos in changes.intersection(CX_keys):
+                if board[CX[pos]] == '.':
+                    score -= 100
+                elif board[CX[pos]] == oppTkn:
+                    score -= 99
 
         sortedMoves.append((score, move))
 
