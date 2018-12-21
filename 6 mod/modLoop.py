@@ -11,9 +11,18 @@ import checkWeight11
 
 t = time.clock()
 
+def display(board):
+    for r in range(0, 8):
+        s = ""+str(r)+" |"
+        for c in range(0, 8):
+            s += board[r*8+c] + " "
+        print(s)
+    print ("  "+" _"*8)
+    print("   0 1 2 3 4 5 6 7")
+
 script1, script2 = checkWeight11, rand
 print(script1, script2)
-loops = 200
+loops = 1
 
 tokenCounts = {0: 0, 1: 0} # first script counts, second counts
 wins = {0:0, 1:0, 2: 0} # first script wins, second wins, ties
@@ -39,6 +48,8 @@ def playGame():
                 exit('Error: ' + currentBoard)
         currentBoard = helper.makeFlips\
             (currentBoard, currentToken, chosenMove)[0]
+        print("player:",currentToken,"move:",chosenMove)
+        display(currentBoard)
         movesMade.append(chosenMove)
         checkPass = helper.nextMoves(currentBoard, oppTkn)[0]
         if checkPass:

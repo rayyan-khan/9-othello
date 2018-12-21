@@ -274,8 +274,9 @@ def stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, tknSet):
         return 0.5 - instability
 
 def mobility(oppPossMoves, flippedBoard, token):
-    oppMobl = len(oppPossMoves)
+    oppMobl = len(oppPossMoves) * 4
     playerMobl = len(nextMoves(flippedBoard, token)[1])
+    #print ("MOBILITY opp",oppMobl,"mine",playerMobl)
     if playerMobl + oppMobl != 0:
         return (playerMobl - oppMobl)/(playerMobl + oppMobl)
     else:
@@ -296,7 +297,7 @@ def sortMoves(token, oppTkn, board, possMoves):
         oppCanMove, oppPossMoves = nextMoves(flippedBoard, oppTkn)
 
         cnr_cx = CNR_CX(token, oppTkn, board, move) * cnrw
-        stbl = stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, TKNSETS_new) * 1.505
+        stbl = stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, TKNSETS_new) * 0
         if not oppCanMove:
             mobl = 0.14127*moblw
         else:
@@ -304,7 +305,14 @@ def sortMoves(token, oppTkn, board, possMoves):
 
         #print('Move: {} CNR: {} Skip: {} STBL: {}'.format(move, cnr_cx, skip, stbl))
 
-        score = cnr_cx + stbl + mobl
+        mytokens = flippedBoard.count(token)
+        opptokens = flippedBoard.count(oppTkn)
+
+        size = (opptokens-mytokens)/(mytokens+opptokens)
+
+        print("mytokens",mytokens,"opptokens",opptokens)
+        score = cnr_cx + mobl + size * boardProgress / 64
+        print("move:",move,"cnr",cnr_cx,"stbl",stbl,"mobility",mobl,"size",size)
         sortedMoves.append((score, move))
 
     return sorted(sortedMoves)
