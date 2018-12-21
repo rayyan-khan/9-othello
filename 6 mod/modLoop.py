@@ -1,23 +1,22 @@
-import rand
-import chooseMove1
+
 import helper
+import rand
+import rand55
+import chooseMove1
+import chooseMove11
+
+xScript, oScript = rand, chooseMove1
+loops = 1000
 
 
 xTokenCount, oTokenCount, xWins, oWins, ties = 0, 0, 0, 0, 0
 lowXtkr, lowOtkr = 1, 1
 lowXmoves, lowOmoves = (), ()
-loops = 1000
 
-
-def totalPercent():
-    xPercent = round(xTokenCount/(xTokenCount + oTokenCount), 4)*100
-    oPercent = 100 - xPercent
-    return xPercent, oPercent
 
 def playGame():
     currentBoard = '.'*27 + 'ox......xo' + '.'*27
     currentToken = 'x'
-    xScript, oScript = rand, chooseMove1
     done = False
     movesMade = []
 
@@ -50,26 +49,34 @@ for k in range(loops):
     xTokenCount += xCount
     oTokenCount += oCount
 
-    xTkr = round(xTokenCount/(xTokenCount + oTokenCount), 2)
-    oTkr = 1 - xTkr
-
-    if xTkr > oTkr:
+    if xCount > oCount:
         xWins += 1
-    elif oTkr > xTkr:
+        print('x win', xCount, oCount, ' '.join([str(k) for k in movesMade]))
+    elif oCount > xCount:
         oWins += 1
     else:
         ties += 1
 
-    if xTkr < lowXtkr:
+    xTkr = xTokenCount/(xTokenCount + oTokenCount)
+    oTkr = oTokenCount/(oTokenCount + xTokenCount)
+
+    if xTkr <= lowXtkr:
         lowXtkr = xTkr
         lowXmoves = (xCount, oCount, movesMade)
-    if oTkr < lowOtkr:
+    if oTkr <= lowOtkr:
         lowOtkr = oTkr
         lowOmoves = (xCount, oCount, movesMade)
 
 
-print('Total Games played: {}\nX wins: {} O wins: {}'.format(loops, xWins, oWins))
+def totalPercent():
+    xPercent = round((xTokenCount/(xTokenCount + oTokenCount))*100, 3)
+    oPercent = 100 - xPercent
+    return xPercent, oPercent
+
 Xp, Op = totalPercent()
+print('Total Games played: {}\nX wins: {} O wins: {} ties: {}'.format(loops, xWins, oWins, ties))
 print('X%: {} O%: {}'.format(Xp, Op))
-print('Worst X game: {}/{} {}'.format(lowXmoves[0], lowXmoves[1], ' '.join([str(k) for k in lowXmoves[2]])))
-print('Worst O game: {}/{} {}'.format(lowOmoves[0], lowOmoves[1], ' '.join([str(k) for k in lowOmoves[2]])))
+
+# currently incorrectly determining the worst game of the better code
+#print('Worst X game: {}/{} {}'.format(lowXmoves[0], lowXmoves[1], ' '.join([str(k) for k in lowXmoves[2]])))
+#print('Worst O game: {}/{} {}'.format(lowOmoves[0], lowOmoves[1], ' '.join([str(k) for k in lowOmoves[2]])))
