@@ -5,6 +5,8 @@ import rand55
 import chooseMove1
 import chooseMove11
 
+print('alternate')
+
 xScript, oScript = rand, chooseMove1
 loops = 1000
 
