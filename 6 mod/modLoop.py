@@ -4,9 +4,10 @@ import rand
 import rand55
 import chooseMove1
 import chooseMove11
+import chooseMove1101
 
-xScript, oScript = rand, chooseMove1
-loops = 1000
+xScript, oScript = chooseMove11, chooseMove1101
+loops = 50
 
 
 xTokenCount, oTokenCount, xWins, oWins, ties = 0, 0, 0, 0, 0
@@ -51,7 +52,7 @@ for k in range(loops):
 
     if xCount > oCount:
         xWins += 1
-        print('x win', xCount, oCount, ' '.join([str(k) for k in movesMade]))
+        #print('x win', xCount, oCount, ' '.join([str(k) for k in movesMade]))
     elif oCount > xCount:
         oWins += 1
     else:
