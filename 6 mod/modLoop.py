@@ -7,13 +7,13 @@ import chooseMove11
 import chooseMove1101
 import chooseMove1102
 import chooseMove1103
-import checkMoblWeight1
+import checkWeight11
 
 t = time.clock()
 
-script1, script2 = chooseMove11, checkMoblWeight1
+script1, script2 = chooseMove11, rand
 print(script1, script2)
-loops = 100
+loops = 500
 
 tokenCounts = {0: 0, 1: 0} # first script counts, second counts
 wins = {0:0, 1:0, 2: 0} # first script wins, second wins, ties
