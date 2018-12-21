@@ -298,7 +298,7 @@ def sortMoves(token, oppTkn, board, possMoves):
         cnr_cx = CNR_CX(token, oppTkn, board, move) * cnrw
         stbl = stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, TKNSETS_new) * 1.505
         if not oppCanMove:
-            mobl = 1
+            mobl = 0.14127*moblw
         else:
             mobl = mobility(oppPossMoves, flippedBoard, token) * moblw
 
