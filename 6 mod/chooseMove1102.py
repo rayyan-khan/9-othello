@@ -1,6 +1,7 @@
 import sys
 import time
 
+# mobility + stability commented out
 
 # global variables
 NBRS_flips = {}  # NBRS_flips = {index: {adjacent indexes}}
@@ -296,7 +297,7 @@ def sortMoves(token, oppTkn, board, possMoves):
         oppCanMove, oppPossMoves = nextMoves(flippedBoard, oppTkn)
 
         cnr_cx = CNR_CX(token, oppTkn, board, move) * cnrw
-        stbl = stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, TKNSETS_new) * 4
+        #stbl = stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, TKNSETS_new) * 4
         if not oppCanMove:
             mobl = 2.5
         else:
@@ -304,7 +305,7 @@ def sortMoves(token, oppTkn, board, possMoves):
 
         #print('Move: {} CNR: {} Skip: {} STBL: {}'.format(move, cnr_cx, skip, stbl))
 
-        score = cnr_cx + stbl + mobl
+        score = cnr_cx #+ mobl # + stbl
         sortedMoves.append((score, move))
 
     return sorted(sortedMoves)

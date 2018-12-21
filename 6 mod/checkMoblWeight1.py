@@ -289,7 +289,7 @@ def sortMoves(token, oppTkn, board, possMoves):
 
     boardProgress = board.count('.')/64
     cnrw = 6*boardProgress
-    moblw = 1/(boardProgress*2)
+    moblw = 1/(boardProgress*2.5)
 
     for move in possMoves:
         flippedBoard, changes, TKNSETS_new = makeFlips(board, token, move)
@@ -298,7 +298,7 @@ def sortMoves(token, oppTkn, board, possMoves):
         cnr_cx = CNR_CX(token, oppTkn, board, move) * cnrw
         stbl = stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, TKNSETS_new) * 4
         if not oppCanMove:
-            mobl = 2.5
+            mobl = 1
         else:
             mobl = mobility(oppPossMoves, flippedBoard, token) * moblw
 
