@@ -11,9 +11,9 @@ import checkWeight11
 
 t = time.clock()
 
-script1, script2 = chooseMove11, rand
+script1, script2 = checkWeight11, rand
 print(script1, script2)
-loops = 500
+loops = 200
 
 tokenCounts = {0: 0, 1: 0} # first script counts, second counts
 wins = {0:0, 1:0, 2: 0} # first script wins, second wins, ties
@@ -77,7 +77,7 @@ def totalPercent():
 
 tkr1, tkr2, wr1, wr2 = totalPercent()
 print('Total Games played: {}\nScript1 wins: {}, Script2 wins: {}, ties: {}'.format(loops, wins[0], wins[1], wins[2]))
-print('Script1 Win Rate: {} Script 2 Win Rate {}'.format(wr1, wr2))
+print('Script1 Win Rate: {} Script 2 Win Rate {} ({}/{})'.format(wr1, wr2, tokenCounts[0], tokenCounts[1]))
 print('Script1 TKR: {}, Script2 TKR: {}'.format(tkr1, tkr2))
 
 # currently incorrectly determining the worst game of the better code
