@@ -6,6 +6,7 @@ import chooseMove1
 import chooseMove11
 import chooseMove1101
 
+
 xScript, oScript = chooseMove11, chooseMove1101
 loops = 50
 
