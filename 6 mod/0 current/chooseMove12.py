@@ -252,16 +252,21 @@ def stableTokens(board, token):
             stableTokens += 3
             if board[14] == token:
                 stableTokens += 1
+            stableTokens += countDiag(board, token, 7)
+
         if {board[48], board[56], board[57]} == {token}:
             # 56 corner
             stableTokens += 3
             if board[49] == token:
                 stableTokens += 1
+            stableTokens += countDiag(board, token, 56)
+
         if {board[55], board[62], board[63]} == {token}:
             # 63 corner
             stableTokens += 3
             if board[54] == token:
                 stableTokens += 1
+            stableTokens += countDiag(board, token, 63)
 
     return stableTokens
 

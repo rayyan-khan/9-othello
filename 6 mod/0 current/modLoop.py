@@ -2,18 +2,14 @@ import time
 import helper
 import rand
 import rand55
-import chooseMove1
+import chooseMove12
 import chooseMove11
-import chooseMove1101
-import chooseMove1102
-import chooseMove1103
-import checkWeight11
 
 t = time.clock()
 
-script1, script2 = chooseMove11, rand
+script1, script2 = chooseMove12, rand
 print(script1, script2)
-loops = 100
+loops = 1000
 
 tokenCounts = {0: 0, 1: 0} # first script counts, second counts
 wins = {0:0, 1:0, 2: 0} # first script wins, second wins, ties
@@ -54,8 +50,6 @@ def playGame():
 for k in range(loops):
     xCount, oCount, movesMade = playGame()
 
-    if k == 50:
-        print(' '.join([str(move) for move in movesMade]))
     tokenCounts[k%2] += xCount
     tokenCounts[(k+1)%2] += oCount
 

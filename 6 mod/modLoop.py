@@ -11,7 +11,7 @@ import checkWeight11
 
 t = time.clock()
 
-script1, script2 = chooseMove11, rand
+script1, script2 = rand55, rand
 print(script1, script2)
 loops = 100
 
@@ -54,8 +54,6 @@ def playGame():
 for k in range(loops):
     xCount, oCount, movesMade = playGame()
 
-    if k == 50:
-        print(' '.join([str(move) for move in movesMade]))
     tokenCounts[k%2] += xCount
     tokenCounts[(k+1)%2] += oCount
 
