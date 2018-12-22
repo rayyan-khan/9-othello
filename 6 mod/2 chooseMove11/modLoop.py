@@ -5,20 +5,13 @@ import rand55
 import chooseMove1
 import chooseMove11
 import chooseMove1101
-<<<<<<< HEAD
-
-
-xScript, oScript = chooseMove11, chooseMove1101
-loops = 50
-=======
 import chooseMove1102
 import chooseMove1103
 import checkWeight11
 
 t = time.clock()
->>>>>>> alternate
 
-script1, script2 = rand55, rand
+script1, script2 = chooseMove11, rand
 print(script1, script2)
 loops = 100
 
@@ -61,16 +54,13 @@ def playGame():
 for k in range(loops):
     xCount, oCount, movesMade = playGame()
 
+    if k == 50:
+        print(' '.join([str(move) for move in movesMade]))
     tokenCounts[k%2] += xCount
     tokenCounts[(k+1)%2] += oCount
 
     if xCount > oCount:
-<<<<<<< HEAD
-        xWins += 1
-        #print('x win', xCount, oCount, ' '.join([str(k) for k in movesMade]))
-=======
         wins[k%2] += 1
->>>>>>> alternate
     elif oCount > xCount:
         wins[(k+1)%2] += 1
     else:
