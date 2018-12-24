@@ -268,6 +268,7 @@ def stableTokens(board, token):
                 stableTokens += 1
             stableTokens += countDiag(board, token, 63)
 
+    printBoard(board)
     return stableTokens
 
 
@@ -338,3 +339,6 @@ def run(board, token):
     canMove, possMoves = nextMoves(board, token)
     move = sortMoves(token, oppTkn, board, possMoves)[::-1][0][1]
     return move
+
+
+

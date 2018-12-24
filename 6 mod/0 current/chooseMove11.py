@@ -29,7 +29,7 @@ CNR_diag = {0: {1: {2, 9, 16}, 2: {3, 10, 17, 24}, 3: {4, 11, 18, 25, 32},
                 4: {5, 12, 19, 26, 33, 40}, 5: {6, 13, 20, 27, 34, 41, 48},
                 6: {7, 14, 21, 28, 35, 42, 49, 56}}}  # note: finish these later and try not to double count corners
 
-# setting up NBRS -- part 1
+# setting up NBRS
 idxs = [i for i in range(64)]
 for index in idxs:  # make better later if time/energy/if its worth it
     if index % 8 == 0:  # if its on left edge, don't include anything left
@@ -272,6 +272,7 @@ def stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, tknSet):
         return est
     else:
         return 0.5 - instability
+
 
 def mobility(oppPossMoves, flippedBoard, token):
     oppMobl = len(oppPossMoves)
