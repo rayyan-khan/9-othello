@@ -1,6 +1,7 @@
 import sys
 import time
 
+# updated stable tokens tables
 
 # global variables
 NBRS_flips = {}  # NBRS_flips = {index: {adjacent indexes}}
