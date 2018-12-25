@@ -296,13 +296,30 @@ def stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, tknSet):
     else:
         return 0.5 - instability
 
-def mobility(oppPossMoves, flippedBoard, token):
+
+def mobility(oppPossMoves, flippedBoard, token, oppToken):
     oppMobl = len(oppPossMoves)
     playerMobl = len(nextMoves(flippedBoard, token)[1])
-    if playerMobl + oppMobl != 0:
+    ptlOppMobl = 0
+    ptlPlyrMbl = 0
+
+    for idx in TKNSETS[oppToken]:  # check opposing token indexes
+        for nbr in NBRS_moves[idx]:  # check if there are spaces you can move into
+            if flippedBoard[nbr] == '.':
+                ptlOppMobl += 1
+    for idx in TKNSETS[token]:
+        for nbr in NBRS_moves[idx]:
+            if flippedBoard[nbr] == '.':
+                ptlPlyrMbl += 1
+
+    oppMobl = (ptlOppMobl - oppMobl)*.5 + oppMobl
+    playerMobl = (ptlPlyrMbl - playerMobl)*.5 + playerMobl
+
+    if playerMobl - oppMobl != 0:
         return (playerMobl - oppMobl)/(playerMobl + oppMobl)
-    else:
-        return 0
+    else: return 0
+
+
 
 
 def sortMoves(token, oppTkn, board, possMoves):
@@ -319,15 +336,15 @@ def sortMoves(token, oppTkn, board, possMoves):
         oppCanMove, oppPossMoves = nextMoves(flippedBoard, oppTkn)
 
         cnr_cx = CNR_CX(token, oppTkn, board, move) * cnrw
-        stbl = stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, TKNSETS_new) * 1.505
+        #stbl = stabletokens_est(token, oppTkn, oppPossMoves, flippedBoard, TKNSETS_new) * 1.505
         if not oppCanMove:
             mobl = 2.5
         else:
-            mobl = mobility(oppPossMoves, flippedBoard, token) * moblw
+            mobl = mobility(oppPossMoves, flippedBoard, token, oppTkn) * moblw
 
         #print('Move: {} CNR: {} Skip: {} STBL: {}'.format(move, cnr_cx, skip, stbl))
 
-        score = cnr_cx + stbl + mobl
+        score = cnr_cx + mobl
         sortedMoves.append((score, move))
 
     return sorted(sortedMoves)

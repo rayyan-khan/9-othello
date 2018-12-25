@@ -1,15 +1,12 @@
 import time
-import helper
-import rand
-import rand55
-import chooseMove12
-import chooseMove11
+import helper, rand, rand55
+import currentTesting, modificationTesting, chooseMove1
 
 t = time.clock()
 
-script1, script2 = chooseMove12, rand
+script1, script2 = rand, chooseMove1
 print(script1, script2)
-loops = 1
+loops = 1000
 
 tokenCounts = {0: 0, 1: 0} # first script counts, second counts
 wins = {0:0, 1:0, 2: 0} # first script wins, second wins, ties
@@ -58,6 +55,16 @@ for k in range(loops):
     else:
         wins[2] += 1
 
+    xTkr = xCount/(xCount + oCount)
+    oTkr = oCount/(oCount + xCount)
+
+    if lowTkr[k%2] > xTkr:
+        lowTkr[k%2] = xTkr
+        lowMoves[k%2] = ['x', xCount, oCount, movesMade]
+    elif lowTkr[(k+1)%2] > oTkr:
+        lowTkr[(k%2)+1] = oTkr
+        lowMoves[(k+1)%2] = ['o', xCount, oCount, movesMade]
+
     script1, script2 = script2, script1
 
 
@@ -81,7 +88,9 @@ print('Script1 Win Rate: {}% Script 2 Win Rate {}% Tie Rate: {}%'.format(wr1, wr
 print('Script1 TKR: {}%, Script2 TKR: {}%'.format(tkr1, tkr2))
 
 # currently incorrectly determining the worst game of the better code
-#print('Worst X game: {}/{} {}'.format(low1moves[0], low1moves[1], ' '.join([str(k) for k in low1moves[2]])))
-#print('Worst O game: {}/{} {}'.format(low2moves[0], low2moves[1], ' '.join([str(k) for k in low2moves[2]])))
+print('Worst 1 game as {}: {}/{} {}'.format(lowMoves[0][0], lowMoves[0][1], lowMoves[0][2],
+                                            ' '.join([str(k) for k in lowMoves[0][3]])))
+print('Worst 2 game as {}: {}/{} {}'.format(lowMoves[1][0], lowMoves[1][1], lowMoves[1][2],
+                                            ' '.join([str(k) for k in lowMoves[1][3]])))
 
 print('Time', round(time.clock()-t, 3))
