@@ -140,7 +140,7 @@ def nextMoves(board, tokens = ''):
     return len(possMoves), possMoves
 
 
-def makeFlips(board, token, position):
+def makeFlips(board, token, position, tknSets):
     oppToken = getOppToken(token)
 
     adjOpps = {nbr for nbr in NBRS_flips[position]
@@ -153,24 +153,57 @@ def makeFlips(board, token, position):
             subset = SUBSETS[opp][position]
             changes = set(subset[:subset.index(idx) + 1] + [position, opp])
             numChanges += len(changes)
-            TKNSETS[token] = TKNSETS[token].union(changes) - {0, 7, 56, 63}
-            TKNSETS[oppToken] = TKNSETS[oppToken] - changes
+            tknSets[token] = tknSets[token].union(changes) - {0, 7, 56, 63}
+            tknSets[oppToken] = tknSets[oppToken] - changes
             board = ''.join([ch if ind not in changes else token for ind, ch in enumerate(board)])
-    return board, numChanges
+    return board, numChanges, tknSets
+
+
+def detStability(pos, board):
+    # a piece is stable when no other piece can be
+    # played that will cause it to be flipped, i.e.
+    # a) when a piece is in rows that are completely
+    # filled in all four flipping directions
+    # b) when a piece is next to a row of stable
+    # squares of its own color in each of the four directions
+    # assumes that you're not checking an empty index
+
+    if pos in (0, 7, 56, 63):
+        return 1
+
+    for nbr in NBRS_moves[pos]:
+        if board[nbr] == '.':
+            diff = pos - nbr
+            oppSide = pos + diff
+            if board[oppSide] == board[pos]:
+                return 1
+            else:
+                return 0
+    return 1
+
+
+def evalStability(token, oppTkn, board, tknSets, possTknChanges, possOppChanges):
+    tknStbl = 0 - len(possOppChanges)
+    oppStbl = 0 - possTknChanges
+
+    for tkn in tknSets[token]:
+        tknStbl += detStability(tkn, board)
+    for oTkn in tknSets[oppTkn]:
+        oppStbl += detStability(oTkn, board)
+
+    if tknStbl + oppStbl != 0:
+        return (tknStbl - oppStbl)/(tknStbl + oppStbl)
+    else:
+        return 0
 
 
 def sortMoves(token, oppTkn, board, possMoves):
     # remember that the grader looks at the last int printed, so
     # print the best move last -- ascending order in this case
     sortedMoves = []
-    #boardProgress = 64 - board.count('.')
+    boardProgress = 64 - board.count('.')
     for move in possMoves:
         score = 0
-        #flippedBoard, numChanges = makeFlips(board, token, move)
-
-        # if near the end of the game try to flip as many as possible
-        #if boardProgress >= 32:
-        #    score += numChanges
 
         oppCanMove, oppPossMoves = nextMoves(board, token)
         if not oppCanMove:
@@ -188,6 +221,13 @@ def sortMoves(token, oppTkn, board, possMoves):
             elif board[CX[move]] == oppTkn:
                 score = -99
 
+        tknSetsCopy = {key: TKNSETS[key] for key in TKNSETS}
+        possBrd, changes, tknSets = makeFlips(board, token, move, tknSetsCopy)
+        possOppChanges = makeFlips(board, oppTkn, move, tknSetsCopy)
+
+        if boardProgress > 8:
+            score += evalStability(token, oppTkn, possBrd, tknSets, changes, possOppChanges)
+
         sortedMoves.append((score, move))
 
     return sorted(sortedMoves)
@@ -198,6 +238,10 @@ def run(board, token):
     setBrdTkn(board, token)
     oppTkn = getOppToken(token)
     canMove, possMoves = nextMoves(board, token)
-    move = sortMoves(token, oppTkn, board, possMoves)[::-1][0][1]
+    moves = sortMoves(token, oppTkn, board, possMoves)
+    move = moves[::-1][0][1]
     #print('{} moves to {}'.format(token, move))
     return move
+
+
+#print(run('.'*27 + 'ox......xo' + '.'*27, 'x'))
