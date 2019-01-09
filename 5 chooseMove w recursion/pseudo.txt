@@ -11,4 +11,23 @@ negamax(brd, tkn)
    bestSeq = min(negamax(flippedBoard(move, board, tkn), tkn), enemy) + [move] for move in psblMovesForTkn)
    return [-best[0]] + best[1:]
 
+do chacheing
+if only one move left and one place to move then skip recursion
+if len(posmoves) == 1 and brd.count('.') == 1:
+    add move, your tokens + one + flipped tokens, opp score = 64 - your score
+
+negamaxTopLvl(brd, tkn)
+  if no moves for tkn:
+    if no moves for enemy"
+      return [brd.count(tkn) - brd.count(enemy)]
+    nm = negamax(brd, enemy)
+      return [-nm[0]] + [nm[1:]] + [-1]
+
+   best = [-65]
+   for move in possibleMoves for tkn
+    nm = negamax(makeMove(brd, tkn, mv))
+    if nm > best:
+        print('score' + appropriate nm)
+        best = nm
+   return appropriate version of best (correct side)
 
