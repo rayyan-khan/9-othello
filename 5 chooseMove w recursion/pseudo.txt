@@ -1,0 +1,14 @@
+def negamaax(brd, tkn) returns best move/min score/path
+return list: min guaranteed score, rev. optimal seq
+
+negamax(brd, tkn)
+  if no moves for tkn:
+    if no moves for enemy"
+      return [brd.count(tkn) - brd.count(enemy)]
+    nm = negamax(brd, enemy)
+      return [-nm[0]] + [nm[1:]] + [-1]
+
+   bestSeq = min(negamax(flippedBoard(move, board, tkn), tkn), enemy) + [move] for move in psblMovesForTkn)
+   return [-best[0]] + best[1:]
+
+
