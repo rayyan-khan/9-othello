@@ -1,5 +1,7 @@
 import sys
 
+# significantly worse
+
 # global variables
 NBRS_flips = {} # NBRS_flips = {index: {adjacent indexes}}
 NBRS_moves = {} # NBRS_moves = {index: {adjacent indexes that moves can be made from}}

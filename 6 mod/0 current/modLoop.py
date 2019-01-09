@@ -4,12 +4,12 @@ import rand
 import chooseMove1
 import chooseMove2
 import chooseMove3
+import chooseMove4
 
 t = time.clock()
-
+results = open('results.txt', 'a')
 script1, script2 = rand, chooseMove3
-print(script1, script2)
-loops = 100
+loops = 1000
 
 tokenCounts = {0: 0, 1: 0} # first script counts, second counts
 wins = {0:0, 1:0, 2: 0} # first script wins, second wins, ties
@@ -85,14 +85,33 @@ def totalPercent():
     return tkr1, tkr2, wr1, wr2, tr
 
 
+# printing methods
+def output(s):
+    global results
+    print(s)
+    results.write('\n' + s)
+
+
+def scriptName(script):
+    s = str(script)
+    return s[s.rfind('\\') + 1: s.find('.') + 3]
+
+
+# printing
 tkr1, tkr2, wr1, wr2, tr = totalPercent()
-print('Total Games played: {}\nScript1 wins: {}, Script2 wins: {}, ties: {}'
-      .format(loops, wins[0], wins[1], wins[2]))
-print('Script1 Win Rate: {}% Script 2 Win Rate {}% Tie Rate: {}%'.format(wr1, wr2, tr))
-print('Script1 TKR: {}%, Script2 TKR: {}%'.format(tkr1, tkr2))
+script1, script2 = scriptName(script1), scriptName(script2)
+output('\nNEW GAME: {} vs. {}'.format(scriptName(script1), scriptName(script2)))
 
-# currently incorrectly determining the worst game of the better code
-print('Worst Script1 game: {}/{} {}'.format(lowMoves[0][0], lowMoves[0][1], ' '.join([str(k) for k in lowMoves[0][2]])))
-print('Worst Script2 game: {}/{} {}'.format(lowMoves[1][0], lowMoves[1][1], ' '.join([str(k) for k in lowMoves[1][2]])))
+output('Total Games played: {}\n{} wins: {}, {} wins: {}, ties: {}'
+      .format(loops, script1, wins[0], script2, wins[1], wins[2]))
 
-print('Time', round(time.clock()-t, 3))
+output('{} Win Rate: {}%, {} Win Rate {}% Tie Rate: {}%'.format(script1, wr1, script2, wr2, tr))
+
+output('{} TKR: {}%, {} TKR: {}%'.format(script1, tkr1, script2, tkr2))
+
+output('Worst {} game: {}/{} {}'
+       .format(script1, lowMoves[0][0], lowMoves[0][1], ' '.join([str(k) for k in lowMoves[0][2]])))
+output('Worst {} game: {}/{} {}'
+       .format(script2, lowMoves[1][0], lowMoves[1][1], ' '.join([str(k) for k in lowMoves[1][2]])))
+
+output('Time: {} seconds'.format(round(time.clock() - t, 3)))
