@@ -1,13 +1,13 @@
 import time
 import helper
 import rand
-import rand55
 import chooseMove1
 import chooseMove2
+import chooseMove3
 
 t = time.clock()
 
-script1, script2 = chooseMove2, rand
+script1, script2 = rand, chooseMove3
 print(script1, script2)
 loops = 100
 
@@ -67,7 +67,7 @@ for k in range(loops):
         lowMoves[k%2] = [xCount, oCount, movesMade]
     if oTkr < lowTkr[(k+1)%2]:
         lowTkr[(k+1)%2] = oTkr
-        lowMoves[(k+1)%2] = [xCount, oCount, movesMade]
+        lowMoves[(k+1)%2] = [oCount, xCount, movesMade]
 
     script1, script2 = script2, script1
 

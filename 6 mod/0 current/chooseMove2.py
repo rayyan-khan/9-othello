@@ -1,7 +1,5 @@
 import sys
 
-# 75%
-
 # global variables
 NBRS_flips = {} # NBRS_flips = {index: {adjacent indexes}}
 NBRS_moves = {} # NBRS_moves = {index: {adjacent indexes that moves can be made from}}
@@ -15,6 +13,7 @@ def setBrdTkn(board, token):
 
 CNR_EDGES = {0: {1,2,3,4,5,6,7,8,16,24,32,40,48,56}, 7: {0,1,2,3,4,5,6,15,23,31,39,47,55,63},
          56: {0,8,16,24,32,40,48,57,58,59,60,61,62,63}, 63: {7,15,23,31,39,47,55,56,57,58,59,60,61,62}}
+CNR_CNR = {0:{56, 7}, 7: {0, 63}, 56: {0, 63}, 63: {56, 7}}
 EDGE_CNR = {edgeInd: corner for corner in CNR_EDGES for edgeInd in CNR_EDGES[corner]}
 CORNERS = {0, 7, 56, 63}
 CX = {1: 0, 8: 0, 9: 0, 6: 7, 14: 7, 15: 7, 48: 56, 49: 56, 57: 56, 54: 63, 55: 63, 62: 63}
@@ -197,36 +196,67 @@ def evalStability(token, oppTkn, board, tknSets, possTknChanges, possOppChanges)
         return 0
 
 
+def evalMobility(token, oppTkn, board):
+    print('hi')
+
+def eval_CNR_CX_EDGE(token, oppTkn, board):
+    tknCnr = 0
+    oppCnr = 0
+    tknCX = 0
+    oppCX = 0
+    tknEdges = 0
+    oppEdges = 0
+
+    for idx in CORNERS:
+        if board[idx] == token:
+            tknCnr += 1
+        elif board[idx] == oppTkn:
+            oppCnr += 1
+    for idx in CX:
+        if board[CX[idx]] == '.':
+            tknCX += 1
+        elif board[CX[idx]] == oppTkn:
+            oppCX += 1
+    for idx in EDGE_CNR:
+        if board[idx] == token:
+            tknEdges += 1
+        elif board[idx] == oppTkn:
+            oppEdges += 1
+    if tknCnr + oppCnr != 0:
+        cnrVal = (tknCnr - oppCnr)/(tknCnr + oppCnr)
+    else: cnrVal = 0
+    if tknCX + oppCX != 0:
+        CXval = (tknCX - oppCX)/(tknCX + oppCX)
+    else: CXval = 0
+    if tknEdges + oppEdges != 0:
+        edgeVal = (tknEdges - oppEdges)/(tknEdges + oppEdges)
+    else: edgeVal = 0
+
+    return cnrVal * 3 - CXval * 5 + edgeVal
+
+
 def sortMoves(token, oppTkn, board, possMoves):
     # remember that the grader looks at the last int printed, so
     # print the best move last -- ascending order in this case
     sortedMoves = []
-    boardProgress = 64 - board.count('.')
+    #boardProgress = 64 - board.count('.')
     for move in possMoves:
         score = 0
 
         oppCanMove, oppPossMoves = nextMoves(board, token)
-        if not oppCanMove:
-            score += 2
-
-        # just checking for corners and edges and stuff like that
-        if move in CORNERS:
-            score += 3
-        elif move in EDGE_CNR:
-            if board[EDGE_CNR[move]] == token:
-                score += 1
-        if move in CX:
-            if board[CX[move]] == '.':
-                score = -100
-            elif board[CX[move]] == oppTkn:
-                score = -99
-
         tknSetsCopy = {key: TKNSETS[key] for key in TKNSETS}
         possBrd, changes, tknSets = makeFlips(board, token, move, tknSetsCopy)
         possOppChanges = makeFlips(board, oppTkn, move, tknSetsCopy)
 
-        if boardProgress > 8:
-            score += evalStability(token, oppTkn, possBrd, tknSets, changes, possOppChanges)
+        # Mobility (so far) --> really just checks for skip
+        if not oppCanMove:
+            score += 1
+
+        # Corners, Edges, CX
+        score += eval_CNR_CX_EDGE(token, oppTkn, possBrd)
+
+        # stability
+        score += evalStability(token, oppTkn, possBrd, tknSets, changes, possOppChanges)
 
         sortedMoves.append((score, move))
 
@@ -242,6 +272,3 @@ def run(board, token):
     move = moves[::-1][0][1]
     #print('{} moves to {}'.format(token, move))
     return move
-
-
-#print(run('.'*27 + 'ox......xo' + '.'*27, 'x'))
