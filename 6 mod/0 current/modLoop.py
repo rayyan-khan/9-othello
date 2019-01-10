@@ -8,8 +8,8 @@ import chooseMove4
 
 t = time.clock()
 results = open('results.txt', 'a')
-script1, script2 = rand, chooseMove3
-loops = 1000
+script1, script2 = rand, chooseMove4
+loops = 200
 
 tokenCounts = {0: 0, 1: 0} # first script counts, second counts
 wins = {0:0, 1:0, 2: 0} # first script wins, second wins, ties
