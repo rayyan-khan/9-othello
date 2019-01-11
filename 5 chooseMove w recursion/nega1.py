@@ -3,8 +3,8 @@ import sys
 # 75%
 
 # inputs from sys
-startboard = sys.argv[1].lower()
-startTkn = sys.argv[2].lower()
+startboard = sys.argv[1].lower() if len(sys.argv) > 1 else '.'*27 + 'ox......xo' + '.'*27
+startTkn = sys.argv[2].lower() if len(sys.argv) > 2 else {0:'x', 1:'o'}[startboard.count('.')%2]
 
 
 # global variables
@@ -18,7 +18,7 @@ CNR_EDGES = {0: {1,2,3,4,5,6,7,8,16,24,32,40,48,56}, 7: {0,1,2,3,4,5,6,15,23,31,
 EDGE_CNR = {edgeInd: corner for corner in CNR_EDGES for edgeInd in CNR_EDGES[corner]}
 CORNERS = {0, 7, 56, 63}
 CX = {1: 0, 8: 0, 9: 0, 6: 7, 14: 7, 15: 7, 48: 56, 49: 56, 57: 56, 54: 63, 55: 63, 62: 63}
-
+oppTkns = {'x':'o', 'o':'x'}
 
 
 # setting up NBRS -- part 1
@@ -83,12 +83,6 @@ def nextTokens(board): # assuming no passes
     return 'x', 'o'
 
 
-def getOppToken(token):
-    if token == 'x':
-        return 'o'
-    return 'x'
-
-
 def printBoard(board):
     for i in range(0, 64, 8):
         print(' '.join(board[i:i+8]))
@@ -121,13 +115,10 @@ def checkBracketing(token, possInd, adjInd, board):
     return -1
 
 
-def nextMoves(board, tokens = ''):
+def nextMoves(board, token):
     possMoves = set() # {indexes that given/default token may make a move at}
 
-    if tokens == '': # if token isn't given
-        token, oppToken = nextTokens(board) # assume no passes and find next token
-    else:
-        token, oppToken = tokens, getOppToken(tokens)
+    oppToken = oppTkns[token]
 
     for idx in TKNSETS[oppToken]: # check opposing token indexes
         for nbr in NBRS_moves[idx]: # check if there are spaces you can move into
@@ -141,7 +132,7 @@ def nextMoves(board, tokens = ''):
 
 
 def makeFlips(board, token, position):
-    oppToken = getOppToken(token)
+    oppToken = oppTkns[token]
 
     adjOpps = {nbr for nbr in NBRS_flips[position]
                if board[nbr] == oppToken and position in SUBSETS[nbr]}
@@ -159,18 +150,15 @@ def makeFlips(board, token, position):
     return board, numChanges
 
 
-def sortMoves(token, oppTkn, board, possMoves):
+def estimateMoves(board, token):
     # remember that the grader looks at the last int printed, so
     # print the best move last -- ascending order in this case
+    oppTkn = oppTkns[token]
+    canMove, possMoves = nextMoves(board, token)
     sortedMoves = []
-    #boardProgress = 64 - board.count('.')
+
     for move in possMoves:
         score = 0
-        #flippedBoard, numChanges = makeFlips(board, token, move)
-
-        # if near the end of the game try to flip as many as possible
-        #if boardProgress >= 32:
-        #    score += numChanges
 
         oppCanMove, oppPossMoves = nextMoves(startboard, startTkn)
         if not oppCanMove:
@@ -193,12 +181,117 @@ def sortMoves(token, oppTkn, board, possMoves):
     return sorted(sortedMoves)
 
 
-def printSorted(board, token):
-    oppTkn = getOppToken(token)
+def negamax(board, token):
+    oppTkn = oppTkns[token]
+
+    print(board)
+
+    # number of possible moves, set of possible moves
     canMove, possMoves = nextMoves(board, token)
-    print(sortMoves(token, oppTkn, board, possMoves))
+
+    if not canMove:
+        # number of enemy possible moves, set of those moves
+        canOppMove, possOppMoves = nextMoves(board, oppTkn)
+
+        if not canOppMove: # if neither side can move, return final score
+            score = [board.count(token) - board.count(oppTkn)]
+            print('POSS SCORE', score)
+            if score[0] == -38:
+                print('-38 BOARD: {} token: {} canMove: {} oppTkn: {} canOppMove: {}'
+                      .format(board, token, canMove, oppTkn, canOppMove))
+            else:
+                print('SCORE = NONE BOARD: {} token: {} canMove: {} oppTkn: {} canOppMove: {}'
+                      .format(board, token, canMove, oppTkn, canOppMove))
+            return score
+        print('skip --> opp tkn {} (tkn = {})'.format(oppTkn, token))
+        nm = negamax(board, oppTkn)
+        skip = [-nm[0]] + nm[1:] + [-1]
+        print('opp tkn nm', skip)
+        return skip
+
+    best = min(negamax(makeFlips(board, token, move)[0], oppTkn) + [move] for move in possMoves)
+    '''
+    best = []
+    for move in possMoves:
+        print('about to nm: {}'.format(move))
+        nm = negamax(makeFlips(board, token, move)[0], oppTkn).append(move)
+        print('nm', nm)
+        best.append(nm)
+        print('best', best)
+    best = min(best)
+    '''
+    return [-best[0]] + best[1:]
+
+
+def negabandaid(board, token):
+    oppTkn = oppTkns[token]
+
+    # number of possible moves, set of possible moves
+    canMove, possMoves = nextMoves(board, token)
+
+    if not canMove:
+        # number of enemy possible moves, set of those moves
+        canOppMove, possOppMoves = nextMoves(board, oppTkn)
+
+        if not canOppMove: # if neither side can move, return final score
+            score = [board.count(token) - board.count(oppTkn)]
+            print('SCORE:', score)
+            if score[0] == -38:
+                print('-38 BOARD: {} token: {} canMove: {} oppTkn: {} canOppMove: {}'
+                      .format(board, token, canMove, oppTkn, canOppMove))
+            else:
+                print('SCORE = NONE BOARD: {} token: {} canMove: {} oppTkn: {} canOppMove: {}'
+                      .format(board, token, canMove, oppTkn, canOppMove))
+            return score
+        print('skip --> opp tkn {} (tkn = {})'.format(oppTkn, token))
+        nm = negamax(board, oppTkn)
+        skip = [-nm[0]] + nm[1:] + [-1]
+        print('opp tkn nm', skip)
+        return skip
+
+    best = min(negamax(makeFlips(board, token, move)[0], oppTkn) + [move] for move in possMoves)
+    '''
+    best = []
+    for move in possMoves:
+        print('about to nm: {}'.format(move))
+        nm = negamax(makeFlips(board, token, move)[0], oppTkn).append(move)
+        print('nm', nm)
+        best.append(nm)
+        print('best', best)
+    best = min(best)
+    '''
+    return [-best[0]] + best[1:]
+
+
+def printSorted(board, token):
+    #print('Board: {}'.format(board))
+    movesLeft = board.count('.')
+    #print('Moves left: {}'.format(movesLeft))
+    if movesLeft == 1:
+        possMoves = nextMoves(board, token)
+        newBoard = makeFlips(board, token, possMoves[0])
+        score = board.count(token) - board.count(oppTkns[token])
+        print('Score: {} Move: {}'.format(score, possMoves[0]))
+    elif movesLeft <= 10:
+        try:
+            nm = negamax(board, token)
+            print('Score: {} Sequence: {}'.format(nm[0], nm[1:]))
+        except:
+            try:
+                nm = negabandaid(board, token)
+            except:
+                move = estimateMoves(board, token)[::-1][0][1]
+                newBoard = makeFlips(board, token, move)
+                guessScore = newBoard.count(token) - newBoard.count(oppTkns[token])
+                print('Score: {} Move: {}'.format(guessScore, move))
+    else:
+        #print('est')
+        move = estimateMoves(board, token)[::-1][0][1]
+        newBoard = makeFlips(board, token, move)
+        guessScore = newBoard.count(token) - newBoard.count(oppTkns[token])
+        print('Score: {} Move: {}'.format(guessScore, move))
 
 
 # run
-print(nextMoves(startboard, startTkn)[1])
+print(estimateMoves(startboard, startTkn))
 printSorted(startboard, startTkn)
