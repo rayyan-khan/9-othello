@@ -109,13 +109,14 @@ def checkBracketing(token, possInd, adjInd, board): # get rid of later
 
 def nextMoves(board, token, tknSets): # return moves to be flipped later
     possMoves = set() # {indexes that given/default token may make a move at}
-
     oppToken = oppTkns[token]
 
     for idx in tknSets[oppToken]: # check opposing token indexes
         for nbr in NBRS_moves[idx]: # check if there are spaces you can move into
             if board[nbr] == '.':
+                print('NBR:', nbr)
                 if checkBracketing(token, nbr, idx, board) != -1:
+                    print('BRACKET:', checkBracketing(token, nbr, idx, board))
                     # if placing here check whether there's another
                     # token down the line it would form a bracket with
                     possMoves.add(nbr) # if so it's a possible move
@@ -124,11 +125,15 @@ def nextMoves(board, token, tknSets): # return moves to be flipped later
 
 
 def makeFlips(board, token, position, tknSets):
-    oppToken = oppTkns[token]
 
-    # neighbors of opposing tokens
+    oppToken = oppTkns[token]
+    original = board
+
+    # opposing neighbor tokens
     adjOpps = {nbr for nbr in NBRS_flips[position]
                if board[nbr] == oppToken and position in SUBSETS[nbr]}
+
+    print('Opposing neighbor tokens:', adjOpps)
 
     numChanges = 0
     for opp in adjOpps: # do better later
@@ -140,6 +145,9 @@ def makeFlips(board, token, position, tknSets):
             tknSets[token] = tknSets[token].union(changes) - {0, 7, 56, 63}
             tknSets[oppToken] = tknSets[oppToken] - changes
             board = ''.join([ch if ind not in changes else token for ind, ch in enumerate(board)])
+
+    if board == original: print('Broken')
+    print('MAKEFLIPS original board: {} \nindex to flip: {} \nflippedboard: {}'.format(original, position, board))
     return board, numChanges
 
 
@@ -173,10 +181,10 @@ def estimateMoves(board, token):
 
         sortedMoves.append((score, move))
 
-    return sorted(sortedMoves)
+    return [move for score, move in sorted(sortedMoves)]
 
 
-def negamax(board, token):
+def negamax(board, token): # broken on case ooooooooooooooo.oooxxoxxoxooxoxxoxxoxoxxooxxooxxoxooooooxxxxxx.o
     oppTkn = oppTkns[token]
     tknSets = {'o': {i for i in range(64) if startboard[i] == 'o'} - {0, 7, 56, 63},
                'x': {i for i in range(64) if startboard[i] == 'x'} - {0, 7, 56, 63}}
@@ -184,7 +192,7 @@ def negamax(board, token):
     # number of possible moves, set of possible moves
     canMove, possMoves = nextMoves(board, token, tknSets)
 
-    print(board)
+    #print(board)
 
     if not canMove:
         # number of enemy possible moves, set of those moves
@@ -192,7 +200,7 @@ def negamax(board, token):
 
         if not canOppMove: # if neither side can move, return final score
             score = [board.count(token) - board.count(oppTkn)]
-            print('POSS SCORE', score)
+            #print('POSS SCORE', score)
             return score
         print('skip --> opp tkn {} (tkn = {})'.format(oppTkn, token))
         nm = negamax(board, oppTkn)
@@ -219,3 +227,12 @@ def printSorted(board, token):
 # run
 print(estimateMoves(startboard, startTkn))
 printSorted(startboard, startTkn)
+'''
+printBoard(startboard)
+print(NBRS_flips[15])
+tknSets = {'o': {i for i in range(64) if startboard[i] == 'o'} - {0, 7, 56, 63},
+               'x': {i for i in range(64) if startboard[i] == 'x'} - {0, 7, 56, 63}}
+print('POSSIBLE moves', nextMoves(startboard, startTkn, tknSets))
+print(makeFlips('ooooooooooooooo.oooxxoxxoxooxoxxoxxoxoxxooxxooxxoxooooooxxxxxx.o', 'o', 15, tknSets))
+'''
+
