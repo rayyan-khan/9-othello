@@ -7,6 +7,7 @@ startTkn = sys.argv[2].lower() if len(sys.argv) > 2 else {0:'x', 1:'o'}[startboa
 # global variables
 NBRS_flips = {} # NBRS_flips = {index: {adjacent indexes}}
 NBRS_moves = {} # NBRS_moves = {index: {adjacent indexes that moves can be made from}}
+NBRS_moves_r = {} # reverse for checking from space
 SUBSETS = [] # SUBSETS = [{nbr: [indexes in subset], nbr: [indexes in subset]}, {etc...}]
 CNR_EDGES = {0: {1,2,3,4,5,6,7,8,16,24,32,40,48,56},
              7: {0,1,2,3,4,5,6,15,23,31,39,47,55,63},
@@ -65,6 +66,7 @@ NBRS_moves = {index: {key for key in SUBSETS[index]} for index in NBRS_flips}
 delInds = {key for key in NBRS_moves if len(NBRS_moves[key]) == 0}
 for key in delInds:
     del NBRS_moves[key]
+NBRS_moves_r = {index: {key for key in NBRS_moves if index in NBRS_moves[key]} for index in range(64)}
 
 
 # helper methods
@@ -101,25 +103,48 @@ def checkBracketing(token, possInd, adjInd, board):
 
 
 def nextMoves(board, token): # return moves to be flipped later
+
+
     possMoves = {} # {possible move indexes: indexes they flip}
     oppToken = oppTkns[token]
-    tknSet = {idx for idx in range(64) if board[idx] == oppToken} - {0, 7, 56, 63}
+    tknSet = set() #{idx for idx in range(64) if board[idx] == oppToken} - {0, 7, 56, 63}
+    spaceSet = set()
+    for idx in set(range(64)) - {0, 7, 56, 63}:
+        if board[idx] == '.': spaceSet.add(idx)
+        elif board[idx] == oppToken: tknSet.add(idx)
 
+    if len(tknSet) <= len(spaceSet):
+        for idx in tknSet: # check opposing token indexes (maybe improve later)
+            for nbr in NBRS_moves[idx]: # check if there are spaces you can move into
+                if board[nbr] == '.':
+                    bracket = checkBracketing(token, nbr, idx, board)
+                    if bracket != -1:
+                        # if placing here check whether there's another
+                        # token down the line it would form a bracket with
+                        subset = SUBSETS[idx][nbr]
+                        changes = set(subset[:subset.index(bracket) + 1] + [nbr, idx])
+                        if nbr in possMoves:
+                            possMoves[nbr] = possMoves[nbr].union(changes)
+                            #print(possMoves[nbr])
+                        else:
+                            possMoves[nbr] = changes
 
-    for idx in tknSet: # check opposing token indexes (maybe improve later)
-        for nbr in NBRS_moves[idx]: # check if there are spaces you can move into
-            if board[nbr] == '.':
-                bracket = checkBracketing(token, nbr, idx, board)
-                if bracket != -1:
-                    # if placing here check whether there's another
-                    # token down the line it would form a bracket with
-                    subset = SUBSETS[idx][nbr]
-                    changes = set(subset[:subset.index(bracket) + 1] + [nbr, idx])
-                    if nbr in possMoves:
-                        possMoves[nbr] = possMoves[nbr].union(changes)
-                        print(possMoves[nbr])
-                    else:
-                        possMoves[nbr] = changes
+    # if there are fewer empty spaces than opposing tokens, try checking them instead
+    # didn't seem to be an improvement
+    else:
+        for idx in spaceSet:
+            #print('idx', idx, 'NBRS', NBRS_moves_r[idx])
+            for nbr in NBRS_moves_r[idx]:
+                if board[nbr] == oppToken:
+                    bracket = checkBracketing(token, idx, nbr, board)
+                    if bracket != -1:
+                        subset = SUBSETS[nbr][idx]
+                        changes = set(subset[:subset.index(bracket) + 1] + [idx, nbr])
+                        if idx in possMoves:
+                            possMoves[idx] = possMoves[idx].union(changes)
+                            #print(possMoves[idx])
+                        else:
+                            possMoves[idx] = changes
     return possMoves
 
 
