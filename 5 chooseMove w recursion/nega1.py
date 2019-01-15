@@ -114,9 +114,7 @@ def nextMoves(board, token, tknSets): # return moves to be flipped later
     for idx in tknSets[oppToken]: # check opposing token indexes
         for nbr in NBRS_moves[idx]: # check if there are spaces you can move into
             if board[nbr] == '.':
-                print('NBR:', nbr)
                 if checkBracketing(token, nbr, idx, board) != -1:
-                    print('BRACKET:', checkBracketing(token, nbr, idx, board))
                     # if placing here check whether there's another
                     # token down the line it would form a bracket with
                     possMoves.add(nbr) # if so it's a possible move
@@ -133,8 +131,6 @@ def makeFlips(board, token, position, tknSets):
     adjOpps = {nbr for nbr in NBRS_flips[position]
                if board[nbr] == oppToken and position in SUBSETS[nbr]}
 
-    print('Opposing neighbor tokens:', adjOpps)
-
     numChanges = 0
     for opp in adjOpps: # do better later
         idx = checkBracketing(token, position, opp, board) # maybe pass in idx rather than re-finding
@@ -146,8 +142,6 @@ def makeFlips(board, token, position, tknSets):
             tknSets[oppToken] = tknSets[oppToken] - changes
             board = ''.join([ch if ind not in changes else token for ind, ch in enumerate(board)])
 
-    if board == original: print('Broken')
-    print('MAKEFLIPS original board: {} \nindex to flip: {} \nflippedboard: {}'.format(original, position, board))
     return board, numChanges
 
 
@@ -192,20 +186,15 @@ def negamax(board, token): # broken on case ooooooooooooooo.oooxxoxxoxooxoxxoxxo
     # number of possible moves, set of possible moves
     canMove, possMoves = nextMoves(board, token, tknSets)
 
-    #print(board)
-
     if not canMove:
         # number of enemy possible moves, set of those moves
         canOppMove, possOppMoves = nextMoves(board, oppTkn, tknSets)
 
         if not canOppMove: # if neither side can move, return final score
             score = [board.count(token) - board.count(oppTkn)]
-            #print('POSS SCORE', score)
             return score
-        print('skip --> opp tkn {} (tkn = {})'.format(oppTkn, token))
         nm = negamax(board, oppTkn)
         skip = [-nm[0]] + nm[1:] + [-1]
-        print('opp tkn nm', skip)
         return skip
 
     best = min(negamax(makeFlips(board, token, move, tknSets)[0], oppTkn) + [move] for move in possMoves)
@@ -213,9 +202,7 @@ def negamax(board, token): # broken on case ooooooooooooooo.oooxxoxxoxooxoxxoxxo
 
 
 def printSorted(board, token):
-    #print('Board: {}'.format(board))
     movesLeft = board.count('.')
-    #print('Moves left: {}'.format(movesLeft))
     if movesLeft <= 3:
         nm = negamax(board, token)
         print('Score: {} Sequence: {}'.format(nm[0], nm[1:]))
@@ -227,12 +214,3 @@ def printSorted(board, token):
 # run
 print(estimateMoves(startboard, startTkn))
 printSorted(startboard, startTkn)
-'''
-printBoard(startboard)
-print(NBRS_flips[15])
-tknSets = {'o': {i for i in range(64) if startboard[i] == 'o'} - {0, 7, 56, 63},
-               'x': {i for i in range(64) if startboard[i] == 'x'} - {0, 7, 56, 63}}
-print('POSSIBLE moves', nextMoves(startboard, startTkn, tknSets))
-print(makeFlips('ooooooooooooooo.oooxxoxxoxooxoxxoxxoxoxxooxxooxxoxooooooxxxxxx.o', 'o', 15, tknSets))
-'''
-
