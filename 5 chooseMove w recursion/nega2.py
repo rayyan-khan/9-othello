@@ -17,7 +17,8 @@ EDGE_CNR = {edgeInd: corner for corner in CNR_EDGES for edgeInd in CNR_EDGES[cor
 CORNERS = {0, 7, 56, 63}
 CX = {1: 0, 8: 0, 9: 0, 6: 7, 14: 7, 15: 7, 48: 56, 49: 56, 57: 56, 54: 63, 55: 63, 62: 63}
 oppTkns = {'x':'o', 'o':'x'}
-
+nextMoveCache = {}
+makeFlipsCache = {}
 
 # setting up NBRS
 idxs = [i for i in range(0, len(startboard))]
@@ -103,54 +104,38 @@ def checkBracketing(token, possInd, adjInd, board):
 
 
 def nextMoves(board, token): # return moves to be flipped later
-
+    global nextMoveCache
+    if board + token in nextMoveCache:
+        return nextMoveCache[board + token]
 
     possMoves = {} # {possible move indexes: indexes they flip}
     oppToken = oppTkns[token]
-    tknSet = set() #{idx for idx in range(64) if board[idx] == oppToken} - {0, 7, 56, 63}
-    spaceSet = set()
-    for idx in set(range(64)) - {0, 7, 56, 63}:
-        if board[idx] == '.': spaceSet.add(idx)
-        elif board[idx] == oppToken: tknSet.add(idx)
+    tknSet = {idx for idx in range(64) if board[idx] == oppToken} - {0, 7, 56, 63}
 
-    if len(tknSet) <= len(spaceSet):
-        for idx in tknSet: # check opposing token indexes (maybe improve later)
-            for nbr in NBRS_moves[idx]: # check if there are spaces you can move into
-                if board[nbr] == '.':
-                    bracket = checkBracketing(token, nbr, idx, board)
-                    if bracket != -1:
-                        # if placing here check whether there's another
-                        # token down the line it would form a bracket with
-                        subset = SUBSETS[idx][nbr]
-                        changes = set(subset[:subset.index(bracket) + 1] + [nbr, idx])
-                        if nbr in possMoves:
-                            possMoves[nbr] = possMoves[nbr].union(changes)
-                            #print(possMoves[nbr])
-                        else:
-                            possMoves[nbr] = changes
-
-    # if there are fewer empty spaces than opposing tokens, try checking them instead
-    # didn't seem to be an improvement
-    else:
-        for idx in spaceSet:
-            #print('idx', idx, 'NBRS', NBRS_moves_r[idx])
-            for nbr in NBRS_moves_r[idx]:
-                if board[nbr] == oppToken:
-                    bracket = checkBracketing(token, idx, nbr, board)
-                    if bracket != -1:
-                        subset = SUBSETS[nbr][idx]
-                        changes = set(subset[:subset.index(bracket) + 1] + [idx, nbr])
-                        if idx in possMoves:
-                            possMoves[idx] = possMoves[idx].union(changes)
-                            #print(possMoves[idx])
-                        else:
-                            possMoves[idx] = changes
+    for idx in tknSet: # check opposing token indexes (maybe improve later)
+        for nbr in NBRS_moves[idx]: # check if there are spaces you can move into
+            if board[nbr] == '.':
+                bracket = checkBracketing(token, nbr, idx, board)
+                if bracket != -1:
+                    # if placing here check whether there's another
+                    # token down the line it would form a bracket with
+                    subset = SUBSETS[idx][nbr]
+                    changes = set(subset[:subset.index(bracket) + 1] + [nbr, idx])
+                    if nbr in possMoves:
+                        possMoves[nbr] = possMoves[nbr].union(changes)
+                    else:
+                        possMoves[nbr] = changes
+    nextMoveCache[board + token] = possMoves
     return possMoves
 
 
-def makeFlips(board, token, changes):
+def makeFlips(board, token, move, changes):
+    global makeFlipsCache
+    if board + token + move in makeFlipsCache:
+        return makeFlipsCache[board + token + move]
     # replace all the indexes that should be flipped with your token
     flippedboard =  ''.join([ch if ind not in changes else token for ind, ch in enumerate(board)])
+    makeFlipsCache[board + token + move] = flippedboard
     return flippedboard
 
 
@@ -207,7 +192,7 @@ def negamax(board, token): # want to return: min guaranteed score, rev. sequence
         return [-nm[0]] + nm[1:] + [-1]
 
     # of the possible scores you might get, find the smallest
-    best = min(negamax(makeFlips(board, token, possMoves[move]), oppTkn)
+    best = min(negamax(makeFlips(board, token, str(move), possMoves[move]), oppTkn)
                + [move] for move in possMoves)
     return [-best[0]] + best[1:]
 
