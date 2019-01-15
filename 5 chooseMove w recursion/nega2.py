@@ -201,7 +201,7 @@ def printSorted(board, token):
     #print('Board: {}'.format(board))
     movesLeft = board.count('.')
     #print('Moves left: {}'.format(movesLeft))
-    if movesLeft <= 3:
+    if movesLeft <= 10:
         nm = negamax(board, token)
         print('Score: {} Sequence: {}'.format(nm[0], nm[1:]))
     else:
