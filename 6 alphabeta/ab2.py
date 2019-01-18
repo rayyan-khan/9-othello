@@ -7,6 +7,7 @@ startTkn = sys.argv[2].lower() if len(sys.argv) > 2 else {0:'x', 1:'o'}[startboa
 # global variables
 NBRS_flips = {} # NBRS_flips = {index: {adjacent indexes}}
 NBRS_moves = {} # NBRS_moves = {index: {adjacent indexes that moves can be made from}}
+NBRS_moves_r = {} # reverse for checking from space
 SUBSETS = [] # SUBSETS = [{nbr: [indexes in subset], nbr: [indexes in subset]}, {etc...}]
 CNR_EDGES = {0: {1,2,3,4,5,6,7,8,16,24,32,40,48,56},
              7: {0,1,2,3,4,5,6,15,23,31,39,47,55,63},
@@ -16,9 +17,8 @@ EDGE_CNR = {edgeInd: corner for corner in CNR_EDGES for edgeInd in CNR_EDGES[cor
 CORNERS = {0, 7, 56, 63}
 CX = {1: 0, 8: 0, 9: 0, 6: 7, 14: 7, 15: 7, 48: 56, 49: 56, 57: 56, 54: 63, 55: 63, 62: 63}
 oppTkns = {'x':'o', 'o':'x'}
-nextMovesChache = {}
+nextMoveCache = {}
 makeFlipsCache = {}
-
 
 # setting up NBRS
 idxs = [i for i in range(0, len(startboard))]
@@ -67,6 +67,7 @@ NBRS_moves = {index: {key for key in SUBSETS[index]} for index in NBRS_flips}
 delInds = {key for key in NBRS_moves if len(NBRS_moves[key]) == 0}
 for key in delInds:
     del NBRS_moves[key]
+NBRS_moves_r = {index: {key for key in NBRS_moves if index in NBRS_moves[key]} for index in range(64)}
 
 
 # helper methods
@@ -102,15 +103,16 @@ def checkBracketing(token, possInd, adjInd, board):
     return -1
 
 
-def nextMoves(board, token, tknSets): # return moves to be flipped later
-    global nextMovesChache
-    if board + token in nextMovesChache:
-        return nextMovesChache[board + token]
+def nextMoves(board, token): # return moves to be flipped later
+    global nextMoveCache
+    if board + token in nextMoveCache:
+        return nextMoveCache[board + token]
 
     possMoves = {} # {possible move indexes: indexes they flip}
     oppToken = oppTkns[token]
+    tknSet = {idx for idx in range(64) if board[idx] == oppToken} - {0, 7, 56, 63}
 
-    for idx in tknSets[oppToken]: # check opposing token indexes (maybe improve later)
+    for idx in tknSet: # check opposing token indexes (maybe improve later)
         for nbr in NBRS_moves[idx]: # check if there are spaces you can move into
             if board[nbr] == '.':
                 bracket = checkBracketing(token, nbr, idx, board)
@@ -120,22 +122,20 @@ def nextMoves(board, token, tknSets): # return moves to be flipped later
                     subset = SUBSETS[idx][nbr]
                     changes = set(subset[:subset.index(bracket) + 1] + [nbr, idx])
                     if nbr in possMoves:
-                        possMoves[nbr].union(changes)
+                        possMoves[nbr] = possMoves[nbr].union(changes)
                     else:
                         possMoves[nbr] = changes
-    # if len(possMoves) == 0, then nextMoves[0] == False
-    nextMovesChache[board + token] = (len(possMoves), possMoves)
-    return len(possMoves), possMoves
+    nextMoveCache[board + token] = possMoves
+    return possMoves
 
 
-def makeFlips(board, token, changes):
+def makeFlips(board, token, move, changes):
     global makeFlipsCache
-    if board + token in makeFlipsCache:
-        return makeFlipsCache[board + token]
+    if board + token + move in makeFlipsCache:
+        return makeFlipsCache[board + token + move]
     # replace all the indexes that should be flipped with your token
     flippedboard =  ''.join([ch if ind not in changes else token for ind, ch in enumerate(board)])
-    #print('BOARD: {} FLIPPED BOARD: {}'.format(board, flippedboard))
-    makeFlipsCache[board + token] = flippedboard
+    makeFlipsCache[board + token + move] = flippedboard
     return flippedboard
 
 
@@ -145,16 +145,14 @@ def estimateMoves(board, token):
     # remember that the grader looks at the last int printed, so
     # print the best move last -- ascending order in this case
     oppTkn = oppTkns[token]
-    tknSets = {'o': {i for i in range(64) if startboard[i] == 'o'} - {0, 7, 56, 63},
-               'x': {i for i in range(64) if startboard[i] == 'x'} - {0, 7, 56, 63}}
-    canMove, possMoves = nextMoves(board, token, tknSets)
+    possMoves = nextMoves(board, token)
     sortedMoves = []
 
     for move in possMoves:
         score = 0
 
-        oppCanMove, oppPossMoves = nextMoves(startboard, startTkn, tknSets)
-        if not oppCanMove:
+        oppPossMoves = nextMoves(startboard, startTkn)
+        if not oppPossMoves:
             score += 2
 
         # just checking for corners and edges and stuff like that
@@ -174,47 +172,39 @@ def estimateMoves(board, token):
     return [move for score, move in sorted(sortedMoves)]
 
 
-def negamax(board, token): # want to return: min guaranteed score, rev. sequence
+def alphabeta(board, token, lower, upper): # want to return: min guaranteed score, rev. sequence
     oppTkn = oppTkns[token]
-    tknSets = {'o': {i for i in range(64) if startboard[i] == 'o'} - {0, 7, 56, 63},
-               'x': {i for i in range(64) if startboard[i] == 'x'} - {0, 7, 56, 63}}
 
-    # number of possible moves, set of possible moves
-    canMove, possMoves = nextMoves(board, token, tknSets)
+    # possible token moves
+    possMoves = nextMoves(board, token)
 
-    if not canMove:
-        # number of enemy possible moves, set of those moves
-        canOppMove, possOppMoves = nextMoves(board, oppTkn, tknSets)
+    if not possMoves:
+        # possible enemy moves
+        possOppMoves = nextMoves(board, oppTkn)
 
-        if not canOppMove: # if neither side can move, return final score
+        if not possOppMoves: # if neither side can move, return final score
             score = [board.count(token) - board.count(oppTkn)]
-            #print('POSS SCORE', score)
             return score
 
-        # otherwise, if you get skipped, just negamax from the opponent's side
-        nm = negamax(board, oppTkn)
-        return [-nm[0]] + nm[1:] + [-1]
+        # otherwise, if you get skipped, just alphabeta from the opponent's side
+        ab = alphabeta(board, oppTkn, -upper, -lower)
+        return [-ab[0]] + ab[1:] + [-1]
 
-    # of the possible scores you might get, find the smallest
-    best = min(negamax(makeFlips(board, token, possMoves[move]), oppTkn)
-               + [move] for move in possMoves)
-    return [-best[0]] + best[1:]
-
-
-def printSorted(board, token):
-    #print('Board: {}'.format(board))
-    movesLeft = board.count('.')
-    #print('Moves left: {}'.format(movesLeft))
-    if movesLeft <= 3:
-        nm = negamax(board, token)
-        print('Score: {} Sequence: {}'.format(nm[0], nm[1:]))
-    else:
-        print('est')
-        print(estimateMoves(board, token))
+    best = [lower - 1]
+    for move in possMoves:
+        ab = alphabeta(makeFlips(board, token, str(move), possMoves[move]), oppTkn, -upper, -lower)
+        score = -ab[0]
+        if score > upper:
+            return [score]
+        if score < lower:
+            continue
+        best = [score] + ab[1:] + [move]
+        lower = score + 1
+    return best
 
 
 # run
 print(estimateMoves(startboard, startTkn))
-printSorted(startboard, startTkn)
-
+ab = alphabeta(startboard, startTkn, -65, 65)
+print('Score: {} Sequence: {}'.format(ab[0], ab[1:]))
 

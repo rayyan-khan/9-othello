@@ -1,0 +1,19 @@
+def alphabeta(board, token, lower, upper): # wants to return a score in [lower, upper]
+    #lit: lower = alpha, upper = beta
+    oppTkn = oppTkns[token]
+    if no moves for tkn:
+        if no moves for oppTkn:
+            return [brd.count(tkn) - brd.count(enemy)]
+        nm = negamax(brd, enemy)
+        return [-nm[0]] + [nm[1:]] + [-1]
+    best = [lower-1]
+    for move in possibleMoves:
+        ab = (makeFlips(board, token, move), oppTkn, -upper, -lower)
+        score = -ab[0]
+        if score >= upper:
+            return [score] #thank u, next
+        if score <= lower:
+            continue
+        #if neither of the above apply, you have an improvement
+        best = [score] + ab[1:] + [mv]
+        lower = score
