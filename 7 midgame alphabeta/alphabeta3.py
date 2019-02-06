@@ -1,3 +1,5 @@
+# seems to be the best -- ranges from ~90 to ~95
+
 import sys
 
 # inputs from sys
@@ -129,8 +131,10 @@ def nextMoves(board, token): # return moves to be flipped later
     return possMoves
 
 
-def makeFlips(board, token, move, changes):
+def makeFlips(board, token, move, possMoves):
     global makeFlipsCache
+    changes = possMoves[move]
+    move = str(move)
     if board + token + move in makeFlipsCache:
         return makeFlipsCache[board + token + move]
     # replace all the indexes that should be flipped with your token
@@ -172,46 +176,72 @@ def estimateMoves(board, token):
     return [move for score, move in sorted(sortedMoves)]
 
 
-def negamax(board, token): # want to return: min guaranteed score, rev. sequence
+def alphabeta(board, token, lower, upper): # want to return: min guaranteed score, rev. sequence
     oppTkn = oppTkns[token]
 
-    # number of possible moves, set of possible moves
+    # possible token moves
     possMoves = nextMoves(board, token)
 
     if not possMoves:
-        # number of enemy possible moves, set of those moves
+        # possible enemy moves
         possOppMoves = nextMoves(board, oppTkn)
 
         if not possOppMoves: # if neither side can move, return final score
             score = [board.count(token) - board.count(oppTkn)]
-            #print('POSS SCORE', score)
             return score
 
-        # otherwise, if you get skipped, just negamax from the opponent's side
-        nm = negamax(board, oppTkn)
-        return [-nm[0]] + nm[1:] + [-1]
+        # otherwise, if you get skipped, just alphabeta from the opponent's side
+        ab = alphabeta(board, oppTkn, -upper, -lower)
+        return [-ab[0]] + ab[1:] + [-1]
 
-    # of the possible scores you might get, find the smallest
-    best = min(negamax(makeFlips(board, token, str(move), possMoves[move]), oppTkn)
-               + [move] for move in possMoves)
-    return [-best[0]] + best[1:]
+    best = [lower - 1]
+    for move in possMoves:
+        ab = alphabeta(makeFlips(board, token, move, possMoves), oppTkn, -upper, -lower)
+        score = -ab[0]
+        if score > upper:
+            return [score]
+        if score < lower:
+            continue
+        best = [score] + ab[1:] + [move]
+        lower = score + 1
+    return best
 
 
-def printSorted(board, token):
-    #print('Board: {}'.format(board))
-    movesLeft = board.count('.')
-    #print('Moves left: {}'.format(movesLeft))
-    if movesLeft <= 12:
-        nm = negamax(board, token)
-        print('Score: {} Sequence: {}'.format(nm[0], nm[1:]))
-    else:
-        print('est')
-        print(estimateMoves(board, token))
+def alphabetaTopLvl(board, token, lower, upper): # want to return: min guaranteed score, rev. sequence
+    oppTkn = oppTkns[token]
+
+    # possible token moves
+    possMoves = nextMoves(board, token)
+
+    if not possMoves:
+        # possible enemy moves
+        possOppMoves = nextMoves(board, oppTkn)
+
+        if not possOppMoves: # if neither side can move, return final score
+            score = [board.count(token) - board.count(oppTkn)]
+            return score
+
+        # otherwise, if you get skipped, just alphabeta from the opponent's side
+        ab = alphabeta(board, oppTkn, -upper, -lower)
+        return [-ab[0]] + ab[1:] + [-1]
+
+    best = [lower - 1]
+    for move in possMoves:
+        ab = alphabeta(makeFlips(board, token, move, possMoves), oppTkn, -upper, -lower)
+        score = -ab[0]
+        if score > upper:
+            return [score]
+        if score < lower:
+            continue
+        best = [score] + ab[1:] + [move]
+        lower = score + 1
+        print(best)
+    return best
 
 
 # run
 print(estimateMoves(startboard, startTkn))
-printSorted(startboard, startTkn)
-#printBoard('.xxxxxxxxxxxxxxxxxxxxxoxxooxxooxxoooxooxoxooxxoxooxxoxoxooooooxx')
-#print(nextMoves('.xxxxxxxxxxxxxxxxxxxxxoxxooxxooxxoooxooxoxooxxoxooxxoxoxooooooxx', 'o'))
+if startboard.count('.') < 15:
+    ab = alphabetaTopLvl(startboard, startTkn, -65, 65)
+    print('Score: {} Sequence: {}'.format(ab[0], ab[1:]))
 

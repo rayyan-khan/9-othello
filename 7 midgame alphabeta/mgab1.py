@@ -1,8 +1,7 @@
+import random
 import sys
+import time
 
-# inputs from sys
-startboard = sys.argv[1].lower() if len(sys.argv) > 1 else '.'*27 + 'ox......xo' + '.'*27
-startTkn = sys.argv[2].lower() if len(sys.argv) > 2 else {0:'x', 1:'o'}[startboard.count('.')%2]
 
 # global variables
 NBRS_flips = {} # NBRS_flips = {index: {adjacent indexes}}
@@ -21,7 +20,7 @@ nextMoveCache = {}
 makeFlipsCache = {}
 
 # setting up NBRS
-idxs = [i for i in range(0, len(startboard))]
+idxs = [i for i in range(64)]
 for index in idxs: # make better later if time/energy/if its worth it
     if index % 8 == 0: # if its on left edge, don't include anything left
         NBRS_flips[index] = {index + 1,
@@ -70,16 +69,10 @@ for key in delInds:
 NBRS_moves_r = {index: {key for key in NBRS_moves if index in NBRS_moves[key]} for index in range(64)}
 
 
-# helper methods
+# helper methods, working with board/moves
 def printBoard(board):
     for i in range(0, 64, 8):
         print(' '.join(board[i:i+8]))
-
-
-def printPossMoves(board, possMoves):
-    # print board with asterisks in place of possible moves
-    printBoard(''.join([ch if idx not in possMoves
-                        else '*' for idx, ch in enumerate(board)]))
 
 
 def checkBracketing(token, possInd, adjInd, board):
@@ -129,8 +122,15 @@ def nextMoves(board, token): # return moves to be flipped later
     return possMoves
 
 
-def makeFlips(board, token, move, changes):
+def randMoves(board, token):
+    moves = [key for key in nextMoves(board, token).keys()]
+    return moves[random.randint(0, len(moves) - 1)]
+
+
+def makeFlips(board, token, move, possMoves):
     global makeFlipsCache
+    changes = possMoves[move]
+    move = str(move)
     if board + token + move in makeFlipsCache:
         return makeFlipsCache[board + token + move]
     # replace all the indexes that should be flipped with your token
@@ -139,6 +139,7 @@ def makeFlips(board, token, move, changes):
     return flippedboard
 
 
+# choosing better moves
 def estimateMoves(board, token):
     # estimate best moves without using recursion
     # could be improved but satisfactory for grade
@@ -151,7 +152,7 @@ def estimateMoves(board, token):
     for move in possMoves:
         score = 0
 
-        oppPossMoves = nextMoves(startboard, startTkn)
+        oppPossMoves = nextMoves(board, token)
         if not oppPossMoves:
             score += 2
 
@@ -172,46 +173,162 @@ def estimateMoves(board, token):
     return [move for score, move in sorted(sortedMoves)]
 
 
-def negamax(board, token): # want to return: min guaranteed score, rev. sequence
+def checkStability(board, token):
+    oppTkn = oppTkns[token]
+    tokenSet, oppSet = set(), set()
+    for position in range(64):
+        if board[position] == token: tokenSet.add(position)
+        elif board[position] == oppTkn: oppSet.add(position)
+
+    stableTokens, stableOpps = 0, 0
+
+    for tkn in tokenSet:
+        stable = True
+        checked = set()
+        for nbr in NBRS_flips[tkn]:
+            if stable == False:
+                break
+            elif nbr in checked:
+                continue
+            elif {*SUBSETS[nbr][tkn]} == {token}:
+                checked.add(nbr)
+            else:
+                diff = tkn - nbr
+                oppSide = tkn + diff
+                if oppSide in checked:
+                    continue
+                else:
+                    if {*SUBSETS[nbr][oppSide]} == {token}:
+                        checked.add(oppSide)
+                    else:
+                        stable = False
+        if stable: stableTokens += 1
+
+    for tkn in oppSet:
+        stable = True
+        checked = set()
+        for nbr in NBRS_flips[tkn]:
+            if stable == False:
+                break
+            elif nbr in checked:
+                continue
+            elif {*SUBSETS[nbr][tkn]} == {token}:
+                checked.add(nbr)
+            else:
+                diff = tkn - nbr
+                oppSide = tkn + diff
+                if oppSide in checked:
+                    continue
+                else:
+                    if {*SUBSETS[nbr][oppSide]} == {token}:
+                        checked.add(oppSide)
+                    else:
+                        stable = False
+        if stable: stableOpps += 1
+
+    if stableOpps + stableTokens != 0:
+        return (stableTokens - stableOpps)/(stableTokens + stableOpps)
+    else: return 0
+
+
+def checkMobility(board, token):
+    return 0;
+
+def alphabeta(board, token, lower, upper): # want to return: min guaranteed score, rev. sequence
     oppTkn = oppTkns[token]
 
-    # number of possible moves, set of possible moves
+    # possible token moves
     possMoves = nextMoves(board, token)
 
     if not possMoves:
-        # number of enemy possible moves, set of those moves
+        # possible enemy moves
         possOppMoves = nextMoves(board, oppTkn)
 
         if not possOppMoves: # if neither side can move, return final score
             score = [board.count(token) - board.count(oppTkn)]
-            #print('POSS SCORE', score)
             return score
 
-        # otherwise, if you get skipped, just negamax from the opponent's side
-        nm = negamax(board, oppTkn)
-        return [-nm[0]] + nm[1:] + [-1]
+        # otherwise, if you get skipped, just alphabeta from the opponent's side
+        ab = alphabeta(board, oppTkn, -upper, -lower)
+        return [-ab[0]] + ab[1:] + [-1]
 
-    # of the possible scores you might get, find the smallest
-    best = min(negamax(makeFlips(board, token, str(move), possMoves[move]), oppTkn)
-               + [move] for move in possMoves)
-    return [-best[0]] + best[1:]
-
-
-def printSorted(board, token):
-    #print('Board: {}'.format(board))
-    movesLeft = board.count('.')
-    #print('Moves left: {}'.format(movesLeft))
-    if movesLeft <= 12:
-        nm = negamax(board, token)
-        print('Score: {} Sequence: {}'.format(nm[0], nm[1:]))
-    else:
-        print('est')
-        print(estimateMoves(board, token))
+    best = [lower - 1]
+    for move in possMoves:
+        ab = alphabeta(makeFlips(board, token, move, possMoves), oppTkn, -upper, -lower)
+        score = -ab[0]
+        if score > upper:
+            return [score]
+        if score < lower:
+            continue
+        best = [score] + ab[1:] + [move]
+        lower = score + 1
+    return best
 
 
-# run
-print(estimateMoves(startboard, startTkn))
-printSorted(startboard, startTkn)
-#printBoard('.xxxxxxxxxxxxxxxxxxxxxoxxooxxooxxoooxooxoxooxxoxooxxoxoxooooooxx')
-#print(nextMoves('.xxxxxxxxxxxxxxxxxxxxxoxxooxxooxxoooxooxoxooxxoxooxxoxoxooooooxx', 'o'))
+def alphabetaTopLvl(board, token, lower, upper): # want to return: min guaranteed score, rev. sequence
+    oppTkn = oppTkns[token]
+
+    # possible token moves
+    possMoves = nextMoves(board, token)
+
+    if not possMoves:
+        # possible enemy moves
+        possOppMoves = nextMoves(board, oppTkn)
+
+        if not possOppMoves: # if neither side can move, return final score
+            score = [board.count(token) - board.count(oppTkn)]
+            return score
+
+        # otherwise, if you get skipped, just alphabeta from the opponent's side
+        ab = alphabeta(board, oppTkn, -upper, -lower)
+        return [-ab[0]] + ab[1:] + [-1]
+
+    best = [lower - 1]
+    for move in possMoves:
+        ab = alphabeta(makeFlips(board, token, move, possMoves), oppTkn, -upper, -lower)
+        score = -ab[0]
+        if score > upper:
+            return [score]
+        if score < lower:
+            continue
+        best = [score] + ab[1:] + [move]
+        lower = score + 1
+        print(best)
+    return best
+
+
+def convertBoard(board):
+    board = board.replace('?', '')
+    board = board.replace('@', 'x')
+    return board
+
+
+def convertMove(move):
+    row = move // 8
+    column = move % 8
+    return (row + 1)*10 + column + 1
+
+
+# required class for othello.tjhsst.edu moderator
+class Strategy():
+    def best_strategy(self, board, player, best_move, running):
+        board = convertBoard(board)
+        player = 'x' if player == '@' else 'o'
+        time.sleep(1)
+        best_move.value = convertMove(estimateMoves(board, player)[::-1][0])
+        if board.count('.') < 15:
+            best_move.value = convertMove(alphabeta(board, player, -65, 65)[::-1][0])
+
+
+# required method for Dr. Gabor's moderator
+def main():
+    # inputs from sys
+    startboard = sys.argv[1].lower() if len(sys.argv) > 1 else '.' * 27 + 'ox......xo' + '.' * 27
+    startTkn = sys.argv[2].lower() if len(sys.argv) > 2 else {0: 'x', 1: 'o'}[startboard.count('.') % 2]
+    print(estimateMoves(startboard, startTkn))
+
+
+# run with sys input
+if __name__ == 'main':
+    main()
 

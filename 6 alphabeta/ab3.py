@@ -1,3 +1,5 @@
+# seems to be the best -- ranges from ~90 to ~95
+
 import sys
 
 # inputs from sys

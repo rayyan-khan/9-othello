@@ -1,0 +1,8 @@
+dictionary of situation, value = move to make
+assignment next class = string of square number, find all possible rotations and flips (8)
+
+def main()
+    blah blah blah
+    if __name__ == 'main':
+        main()
+

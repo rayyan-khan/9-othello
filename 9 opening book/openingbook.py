@@ -1,10 +1,16 @@
+# seems to be the best -- ranges from ~90 to ~95
+
 import sys
 
-# inputs from sys
+'''
+INPUTS FROM SYS
+'''
 startboard = sys.argv[1].lower() if len(sys.argv) > 1 else '.'*27 + 'ox......xo' + '.'*27
 startTkn = sys.argv[2].lower() if len(sys.argv) > 2 else {0:'x', 1:'o'}[startboard.count('.')%2]
 
-# global variables
+'''
+GLOBAL VARIABLES
+'''
 NBRS_flips = {} # NBRS_flips = {index: {adjacent indexes}}
 NBRS_moves = {} # NBRS_moves = {index: {adjacent indexes that moves can be made from}}
 NBRS_moves_r = {} # reverse for checking from space
@@ -69,8 +75,23 @@ for key in delInds:
     del NBRS_moves[key]
 NBRS_moves_r = {index: {key for key in NBRS_moves if index in NBRS_moves[key]} for index in range(64)}
 
+# opening book
+openingBook = {'...........................ox......xo...........................': 19,
+               '..................ox.......ox......xo...........................': 26,
+               '..................ooo.....xxo......xo...........................': 11,}
 
-# helper methods
+boardIndexes = [[0, 1, 2, 3, 4, 5, 6, 7],
+                [8, 9, 10, 11, 12, 13, 14, 15],
+                [16, 17, 18, 19, 20, 21, 22, 23],
+                [24, 25, 26, 27, 28, 29, 30, 31],
+                [32, 33, 34, 35, 36, 37, 38, 39],
+                [40, 41, 42, 43, 44, 45, 46, 47],
+                [48, 49, 50, 51, 52, 53, 54, 55],
+                [56, 57, 58, 59, 60, 61, 62, 63]]
+
+'''
+HELPER METHODS DEALING WITH BOARD
+'''
 def printBoard(board):
     for i in range(0, 64, 8):
         print(' '.join(board[i:i+8]))
@@ -129,8 +150,10 @@ def nextMoves(board, token): # return moves to be flipped later
     return possMoves
 
 
-def makeFlips(board, token, move, changes):
+def makeFlips(board, token, move, possMoves):
     global makeFlipsCache
+    changes = possMoves[move]
+    move = str(move)
     if board + token + move in makeFlipsCache:
         return makeFlipsCache[board + token + move]
     # replace all the indexes that should be flipped with your token
@@ -139,6 +162,120 @@ def makeFlips(board, token, move, changes):
     return flippedboard
 
 
+'''
+ROTATION METHODS
+'''
+def matrToString(matr):
+    # given an array of arrays, return a string of
+    # its contents starting top left to bottom right
+    s = ''
+    for row in range(len(matr)):
+       s += ''.join([str(i) for i in matr[row]])
+    return s
+
+
+def detWidth(s):
+    # based on string representing matrix,
+    # determine its width: smallest integer
+    # that evenly divides the length of the
+    # board that is no less than the square
+    # root of the length of the board
+    s = len(s)
+    i = 1
+    if s**.5 == (s**.5)//1:
+        return int(s**.5)
+    while True:
+        possW = int((s**.5)//1 + i)
+        if s % possW == 0:
+            return possW
+        i += 1
+
+
+def strToMatr(smatr, w):
+    matr = []
+    for r in range(int(len(smatr)/w)):
+        row = []
+        for col in range(w):
+            row.append(smatr[r*w + col])
+        matr.append(row)
+    return matr
+
+
+# rotations
+def rotateCCW(matr):
+    w = len(matr[0])
+    newmatr = [[0 for i in range(len(matr))] for j in range(w)]
+    for row in range(len(matr)):
+        for col in range(w):
+            newmatr[w - col - 1][row] = matr[row][col]
+    return newmatr
+
+
+def rotate180(matr): # probably not efficient, but whatever
+    ccwmatr = rotateCCW(matr)
+    return rotateCCW(ccwmatr)
+
+
+def rotateCW(matr):
+    matr180 = rotate180(matr)
+    return rotateCCW(matr180)
+
+
+# reflections
+def flipV(matr):
+    w = len(matr[0])
+    newmatr = [[0 for i in range(w)] for j in range(len(matr))]
+    for row in range(len(matr)):
+        for col in range(w):
+            newmatr[row][w - col - 1] = matr[row][col]
+    return newmatr
+
+
+def flipH(matr):
+    w = len(matr[0])
+    h = len(matr)
+    newmatr = [[0 for i in range(w)] for j in range(len(matr))]
+    for row in range(h):
+        for col in range(w):
+            newmatr[h - row - 1][col] = matr[row][col]
+    return newmatr
+
+
+def flipPosDiag(matr):
+    ccwm = rotateCCW(matr)
+    return flipV(ccwm)
+
+
+def flipNegDiag(matr):
+    ccwm = rotateCCW(matr)
+    return flipH(ccwm)
+
+
+def checkOpeningBook(board): # board as string
+    global openingBook
+    global boardIndexes
+
+    if board in openingBook:
+        return openingBook[board]
+
+    else:
+        board = strToMatr(board, 8)
+        fliph = matrToString(flipH(board))
+        if fliph in openingBook:
+            moveInd = openingBook[fliph]
+            return (7 - moveInd//8) * 8 + moveInd % 8
+        flipv = matrToString(flipV(board))
+        if flipv in openingBook:
+            moveInd = openingBook[flipv]
+            return (moveInd // 8) * 8 + (7 - moveInd % 8)
+        flipp = matrToString(flipPosDiag(board))
+        # finish later
+    return -1
+
+
+'''
+ROUGH ESTIMATE OF MOVE QUALITY
+'''
 def estimateMoves(board, token):
     # estimate best moves without using recursion
     # could be improved but satisfactory for grade
@@ -172,46 +309,80 @@ def estimateMoves(board, token):
     return [move for score, move in sorted(sortedMoves)]
 
 
-def negamax(board, token): # want to return: min guaranteed score, rev. sequence
+'''
+SEARCHING
+'''
+def alphabeta(board, token, lower, upper): # want to return: min guaranteed score, rev. sequence
     oppTkn = oppTkns[token]
 
-    # number of possible moves, set of possible moves
+    # possible token moves
     possMoves = nextMoves(board, token)
 
     if not possMoves:
-        # number of enemy possible moves, set of those moves
+        # possible enemy moves
         possOppMoves = nextMoves(board, oppTkn)
 
         if not possOppMoves: # if neither side can move, return final score
             score = [board.count(token) - board.count(oppTkn)]
-            #print('POSS SCORE', score)
             return score
 
-        # otherwise, if you get skipped, just negamax from the opponent's side
-        nm = negamax(board, oppTkn)
-        return [-nm[0]] + nm[1:] + [-1]
+        # otherwise, if you get skipped, just alphabeta from the opponent's side
+        ab = alphabeta(board, oppTkn, -upper, -lower)
+        return [-ab[0]] + ab[1:] + [-1]
 
-    # of the possible scores you might get, find the smallest
-    best = min(negamax(makeFlips(board, token, str(move), possMoves[move]), oppTkn)
-               + [move] for move in possMoves)
-    return [-best[0]] + best[1:]
+    best = [lower - 1]
+    for move in possMoves:
+        ab = alphabeta(makeFlips(board, token, move, possMoves), oppTkn, -upper, -lower)
+        score = -ab[0]
+        if score > upper:
+            return [score]
+        if score < lower:
+            continue
+        best = [score] + ab[1:] + [move]
+        lower = score + 1
+    return best
 
 
-def printSorted(board, token):
-    #print('Board: {}'.format(board))
-    movesLeft = board.count('.')
-    #print('Moves left: {}'.format(movesLeft))
-    if movesLeft <= 12:
-        nm = negamax(board, token)
-        print('Score: {} Sequence: {}'.format(nm[0], nm[1:]))
-    else:
-        print('est')
-        print(estimateMoves(board, token))
+def alphabetaTopLvl(board, token, lower, upper): # want to return: min guaranteed score, rev. sequence
+    oppTkn = oppTkns[token]
+
+    # possible token moves
+    possMoves = nextMoves(board, token)
+
+    if not possMoves:
+        # possible enemy moves
+        possOppMoves = nextMoves(board, oppTkn)
+
+        if not possOppMoves: # if neither side can move, return final score
+            score = [board.count(token) - board.count(oppTkn)]
+            return score
+
+        # otherwise, if you get skipped, just alphabeta from the opponent's side
+        ab = alphabeta(board, oppTkn, -upper, -lower)
+        return [-ab[0]] + ab[1:] + [-1]
+
+    best = [lower - 1]
+    for move in possMoves:
+        ab = alphabeta(makeFlips(board, token, move, possMoves), oppTkn, -upper, -lower)
+        score = -ab[0]
+        if score > upper:
+            return [score]
+        if score < lower:
+            continue
+        best = [score] + ab[1:] + [move]
+        lower = score + 1
+        print(best)
+    return best
 
 
 # run
-print(estimateMoves(startboard, startTkn))
-printSorted(startboard, startTkn)
-#printBoard('.xxxxxxxxxxxxxxxxxxxxxoxxooxxooxxoooxooxoxooxxoxooxxoxoxooooooxx')
-#print(nextMoves('.xxxxxxxxxxxxxxxxxxxxxoxxooxxooxxoooxooxoxooxxoxooxxoxoxooooooxx', 'o'))
+opening = checkOpeningBook(startboard)
+if opening > -1:
+    print(opening)
+elif startboard.count('.') < 10:
+    print(estimateMoves(startboard, startTkn))
+    ab = alphabetaTopLvl(startboard, startTkn, -65, 65)
+    print('Score: {} Sequence: {}'.format(ab[0], ab[1:]))
+else:
+    print(estimateMoves(startboard, startTkn))
 
